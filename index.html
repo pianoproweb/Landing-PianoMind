@@ -2283,20 +2283,13 @@
         error.style.display = 'none';
 
         try {
-          const res = await fetch('https://connect.mailerlite.com/api/subscribers', {
+          const res = await fetch('/api/subscribe', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI0IiwianRpIjoiYzEyNDRkZWJmOTk3NTM5MGJlN2UyZGUyZTBhNjczYjNjMThkMjExYWM5N2Y3MDdhY2RjN2FlMzgzNWRkYmFkZDFiZWEzMzY3ZTg3M2M1N2IiLCJpYXQiOjE3NzY4OTczMzguMzA3MTQsIm5iZiI6MTc3Njg5NzMzOC4zMDcxNDMsImV4cCI6NDkzMjU3MDkzOC4zMDI3MjMsInN1YiI6IjE3Nzg5OTkiLCJzY29wZXMiOltdfQ.tmSDpbYnUE4pQ0P0A3uEZmOndWjnamKqPHWr5IhjHbJu-6So-dE-0FYB1WehNutKntKwz62Z7GHFqkZc4-18z-qPgR1AvbxVEmuvQF2nfF_IW7YAr7xSkiSuydRsZw4PmpqQXs79F_AO4K8N5iDLOmv-igGc9g1CjzhKJ9GdyjnQvqV_dr4SuZxJz9YjAZXCqHypz_oQisdgCDArYLRw6ISwU43slPb3AqqdrIXbnaoqTqCzlgn7yg0Vqk4youQsZbEud3kWDVtGtp4J00KyRzPsK0P8pwSNmf_Al8IfGv-dUnWPzzBbsrhdx0pk4Yzs_GMePMmxy-5spynVCtGrhLSg8vRQGY-GsqV6GVmn-sYbYTpExzNdWmzB35Pd4irhTir92X6j1LNy4ktnZsRacP6-S-J9Z0W-RdaQqZakZywPLHR0kJKBEJ4yf_gjPNcGzY3SjUfDQQbjAbYOmq4ohwEzOjeQ8URQHuwHkTSyQ3uBq74CSTeyJ8eUI2tV8m_HJy_mGROBcPaokZBkmsK_RsUl5tOL2mTZ7XIdE1G79cdb9-TzVHHZ3Xw4qWJRrq62C2T4DRg2jD24_bavhvGSnqH9Pyr70e3A8SrQWmTxvJYbD7D8hE4lwN7zefk0zMzDUwQXZ1CFsJRGH-flbLS3iDOS3Od9XSAbW3rKMEA6uOc'
-            },
-            body: JSON.stringify({
-              email: email,
-              fields: { name: name },
-              groups: ['185490439083656209']
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email })
           });
 
-          if (res.ok || res.status === 201 || res.status === 200) {
+          if (res.ok) {
             form.style.display = 'none';
             success.style.display = 'block';
           } else {
