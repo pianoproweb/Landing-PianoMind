@@ -1589,6 +1589,21 @@
       .solution-card-title { font-size: 24px; margin-bottom: 18px; }
       .solution-card-body  { font-size: 15px; line-height: 1.78; }
     }
+
+    /* GPU acceleration for scroll-triggered elements (post-hero) */
+    .problem-header-inner,
+    .problem-item,
+    .solution-header-inner,
+    .solution-card,
+    .authority-header-inner,
+    .authority-card,
+    .learn-header-inner,
+    .learn-card,
+    .testimonials-header-inner,
+    .testi-card,
+    .cta-final-inner-anim {
+      will-change: transform, opacity;
+    }
   </style>
 </head>
 
@@ -2173,15 +2188,15 @@
 
     // Learn section — GSAP scroll animations
     gsap.to('.learn-header-inner', {
-      opacity: 1, y: 0, duration: 1.0, ease: 'power3.out',
-      scrollTrigger: { trigger: '.learn-header', start: 'top 78%' }
+      opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+      scrollTrigger: { trigger: '.learn-header', start: 'top 90%' }
     });
 
     gsap.utils.toArray('.learn-card').forEach((card, i) => {
       gsap.to(card, {
-        opacity: 1, y: 0, duration: 0.85, ease: 'power3.out',
-        delay: (i % 2) * 0.15,
-        scrollTrigger: { trigger: card, start: 'top 88%' }
+        opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+        delay: (i % 2) * 0.08,
+        scrollTrigger: { trigger: card, start: 'top 90%' }
       });
     });
 
@@ -2207,63 +2222,63 @@
 
     // Final CTA section — scroll-triggered animation
     gsap.to('.cta-final-inner-anim', {
-      opacity: 1, y: 0, duration: 1.1, ease: 'power3.out',
-      scrollTrigger: { trigger: '.cta-final-section', start: 'top 72%' }
+      opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+      scrollTrigger: { trigger: '.cta-final-section', start: 'top 90%' }
     });
 
     // Testimonials section — scroll-triggered animations
     gsap.to('.testimonials-header-inner', {
-      opacity: 1, y: 0, duration: 1.0, ease: 'power3.out',
-      scrollTrigger: { trigger: '.testimonials-header', start: 'top 78%' }
+      opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+      scrollTrigger: { trigger: '.testimonials-header', start: 'top 90%' }
     });
 
     gsap.utils.toArray('.testi-card').forEach((card, i) => {
       gsap.to(card, {
-        opacity: 1, y: 0, duration: 0.85, ease: 'power3.out',
-        delay: i * 0.15,
-        scrollTrigger: { trigger: '.testimonials-grid', start: 'top 82%' }
+        opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+        delay: i * 0.08,
+        scrollTrigger: { trigger: '.testimonials-grid', start: 'top 90%' }
       });
     });
 
     // Authority section — scroll-triggered animations
     gsap.to('.authority-header-inner', {
-      opacity: 1, y: 0, duration: 1.0, ease: 'power3.out',
-      scrollTrigger: { trigger: '.authority-header', start: 'top 78%' }
+      opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+      scrollTrigger: { trigger: '.authority-header', start: 'top 90%' }
     });
 
     gsap.utils.toArray('.authority-card').forEach((card, i) => {
       gsap.to(card, {
-        opacity: 1, y: 0, duration: 0.85, ease: 'power3.out',
-        delay: i * 0.15,
-        scrollTrigger: { trigger: '.authority-grid', start: 'top 82%' }
+        opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+        delay: i * 0.08,
+        scrollTrigger: { trigger: '.authority-grid', start: 'top 90%' }
       });
     });
 
     // Solution section — scroll-triggered animations
     gsap.to('.solution-header-inner', {
-      opacity: 1, y: 0, duration: 1.0, ease: 'power3.out',
-      scrollTrigger: { trigger: '.solution-header', start: 'top 78%' }
+      opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+      scrollTrigger: { trigger: '.solution-header', start: 'top 90%' }
     });
 
     gsap.utils.toArray('.solution-card').forEach((card, i) => {
       gsap.to(card, {
-        opacity: 1, y: 0, duration: 0.85, ease: 'power3.out',
-        delay: i * 0.15,
-        scrollTrigger: { trigger: '.solution-grid', start: 'top 82%' }
+        opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+        delay: i * 0.08,
+        scrollTrigger: { trigger: '.solution-grid', start: 'top 90%' }
       });
     });
 
     // Problem section — scroll-triggered animations
     gsap.to('.problem-header-inner', {
-      opacity: 1, y: 0, duration: 1.0, ease: 'power3.out',
-      scrollTrigger: { trigger: '.problem-header', start: 'top 78%' }
+      opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+      scrollTrigger: { trigger: '.problem-header', start: 'top 90%' }
     });
 
     gsap.utils.toArray('.problem-item').forEach((item, i) => {
       gsap.to(item, {
-        opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
+        opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
         delay: i * 0.08,
-        scrollTrigger: { trigger: item, start: 'top 84%' }
+        scrollTrigger: { trigger: item, start: 'top 90%' }
       });
     });
 
