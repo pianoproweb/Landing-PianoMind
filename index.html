@@ -132,15 +132,20 @@
     /* Navbar */
     .navbar {
       position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 9999;
-      padding: calc(22px + env(safe-area-inset-top)) 52px 22px;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #080D1A;
+      z-index: 99999;
+      -webkit-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+      padding-top: env(safe-area-inset-top);
+      padding-right: 52px;
+      padding-bottom: 22px;
+      padding-left: 52px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #080D1A !important;
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
       border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
 
@@ -1618,6 +1623,24 @@
     .cta-final-inner-anim {
       will-change: transform, opacity;
     }
+
+    /* Mobile: disable all post-hero scroll animations — render visible */
+    @media (max-width: 768px) {
+      .problem-header-inner,
+      .problem-item,
+      .solution-header-inner,
+      .solution-card,
+      .authority-header-inner,
+      .authority-card,
+      .learn-header-inner,
+      .learn-card,
+      .testimonials-header-inner,
+      .testi-card,
+      .cta-final-inner-anim {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
   </style>
 </head>
 
@@ -2200,21 +2223,7 @@
       update();
     })();
 
-    // Learn section — GSAP scroll animations
-    gsap.to('.learn-header-inner', {
-      opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
-      scrollTrigger: { trigger: '.learn-header', start: 'top 90%' }
-    });
-
-    gsap.utils.toArray('.learn-card').forEach((card, i) => {
-      gsap.to(card, {
-        opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
-        delay: (i % 2) * 0.08,
-        scrollTrigger: { trigger: card, start: 'top 90%' }
-      });
-    });
-
-    // Learn section — accordion
+    // Learn section — accordion (interaction-driven, all viewports)
     document.querySelectorAll('.learn-card').forEach(card => {
       card.addEventListener('click', () => {
         const body = card.querySelector('.learn-card-body');
@@ -2231,6 +2240,23 @@
           gsap.set(body, { height: 0 });
           gsap.to(body, { height: h, duration: 0.42, ease: 'power3.inOut' });
         }
+      });
+    });
+
+    // Post-hero scroll animations — desktop/tablet only (disabled on mobile)
+    if (window.innerWidth > 768) {
+
+    // Learn section — GSAP scroll animations
+    gsap.to('.learn-header-inner', {
+      opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+      scrollTrigger: { trigger: '.learn-header', start: 'top 90%' }
+    });
+
+    gsap.utils.toArray('.learn-card').forEach((card, i) => {
+      gsap.to(card, {
+        opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
+        delay: (i % 2) * 0.08,
+        scrollTrigger: { trigger: card, start: 'top 90%' }
       });
     });
 
@@ -2315,6 +2341,8 @@
         items.forEach(item => io.observe(item));
       }
     })();
+
+    } // end post-hero scroll animations gate
 
     tl.to('#eyebrow',     { opacity: 1, y: 0, duration: 0.85, delay: 0.35 })
       .to('#headline',    { opacity: 1, y: 0, duration: 1.05 }, '-=0.55')
