@@ -133,12 +133,14 @@
     .navbar {
       position: fixed;
       top: 0; left: 0; right: 0;
-      z-index: 50;
+      z-index: 9999;
       padding: calc(22px + env(safe-area-inset-top)) 52px 22px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #080D1A;
+      background: #080D1A !important;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
       border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
 
@@ -461,7 +463,13 @@
       padding: 28px 0;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
       opacity: 0;
-      transform: translateY(28px);
+      transform: translateY(20px);
+      transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    }
+
+    .problem-item.is-visible {
+      opacity: 1;
+      transform: none;
     }
 
     .problem-item:last-child {
@@ -496,10 +504,16 @@
       color: var(--text-muted);
     }
 
-    /* Scroll-triggered fade */
+    /* Scroll-triggered fade (IntersectionObserver) */
     .problem-header-inner {
       opacity: 0;
-      transform: translateY(28px);
+      transform: translateY(20px);
+      transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    }
+
+    .problem-header-inner.is-visible {
+      opacity: 1;
+      transform: none;
     }
 
     /* ── Tablet 768px+ ─────────────────────── */
@@ -2268,19 +2282,39 @@
       });
     });
 
-    // Problem section — scroll-triggered animations
-    gsap.to('.problem-header-inner', {
-      opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
-      scrollTrigger: { trigger: '.problem-header', start: 'top 90%' }
-    });
+    // Problem section — pure CSS via IntersectionObserver (lighter on mobile)
+    (function() {
+      const header = document.querySelector('.problem-header-inner');
+      const items  = Array.from(document.querySelectorAll('.problem-item'));
 
-    gsap.utils.toArray('.problem-item').forEach((item, i) => {
-      gsap.to(item, {
-        opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
-        delay: i * 0.08,
-        scrollTrigger: { trigger: item, start: 'top 90%' }
-      });
-    });
+      const opts = { threshold: 0.15, rootMargin: '0px 0px -8% 0px' };
+
+      if (header) {
+        const ho = new IntersectionObserver((entries, obs) => {
+          entries.forEach(e => {
+            if (e.isIntersecting) {
+              e.target.classList.add('is-visible');
+              obs.unobserve(e.target);
+            }
+          });
+        }, opts);
+        ho.observe(header);
+      }
+
+      if (items.length) {
+        const io = new IntersectionObserver((entries, obs) => {
+          entries.forEach(e => {
+            if (e.isIntersecting) {
+              const idx = items.indexOf(e.target);
+              e.target.style.transitionDelay = (idx * 0.1) + 's';
+              e.target.classList.add('is-visible');
+              obs.unobserve(e.target);
+            }
+          });
+        }, opts);
+        items.forEach(item => io.observe(item));
+      }
+    })();
 
     tl.to('#eyebrow',     { opacity: 1, y: 0, duration: 0.85, delay: 0.35 })
       .to('#headline',    { opacity: 1, y: 0, duration: 1.05 }, '-=0.55')
