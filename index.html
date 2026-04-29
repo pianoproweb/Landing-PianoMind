@@ -1641,6 +1641,246 @@
         transform: none !important;
       }
     }
+
+    /* ── FAQ section ── */
+    .faq-section {
+      position: relative;
+      z-index: 1;
+      padding: 96px 24px;
+    }
+
+    .faq-inner {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .faq-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .faq-eyebrow {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .faq-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 3.2vw, 44px);
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.015em;
+      line-height: 1.15;
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .faq-item {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: border-color 0.25s ease, background 0.25s ease;
+    }
+
+    .faq-item.open {
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(255,255,255,0.26);
+    }
+
+    .faq-question {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .faq-question-text {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .faq-chevron {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+      transition: transform 0.3s ease, color 0.25s ease;
+    }
+
+    .faq-item.open .faq-chevron {
+      transform: rotate(180deg);
+      color: var(--accent);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+      padding: 0 24px;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 400px;
+      padding: 0 24px 20px;
+    }
+
+    .faq-answer p {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.72;
+    }
+
+    .faq-answer p em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    /* ── Footer ── */
+    .site-footer {
+      position: relative;
+      z-index: 1;
+      background: #080D1A;
+      border-top: 0.5px solid rgba(255,255,255,0.15);
+      padding: 48px 52px;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .footer-brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-brand-row img {
+      height: 24px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      opacity: 0.75;
+    }
+
+    .footer-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-primary);
+      opacity: 0.75;
+    }
+
+    .footer-vat {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .footer-legal {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-legal-sep {
+      font-size: 13px;
+      color: rgba(255,255,255,0.3);
+      user-select: none;
+    }
+
+    .footer-legal a,
+    .footer-legal .iubenda-embed {
+      font-family: 'DM Sans', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 300 !important;
+      color: rgba(255,255,255,0.6) !important;
+      text-decoration: none !important;
+      background: none !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      transition: color 0.2s ease;
+    }
+
+    .footer-legal a:hover,
+    .footer-legal .iubenda-embed:hover {
+      color: rgba(255,255,255,0.9) !important;
+    }
+
+    .footer-divider {
+      width: 100%;
+      height: 0.5px;
+      background: rgba(255,255,255,0.08);
+      margin-bottom: 24px;
+    }
+
+    .footer-copyright {
+      text-align: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.4);
+    }
+
+    @media (max-width: 768px) {
+      .site-footer { padding: 48px 24px; }
+
+      .footer-top {
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+        text-align: center;
+      }
+
+      .footer-brand { align-items: center; }
+
+      .footer-legal {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .footer-legal-sep { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .faq-chevron, .faq-answer { transition: none; }
+    }
+
   </style>
 </head>
 
@@ -2100,6 +2340,101 @@
 
   </section>
 
+  <!-- FAQ section -->
+  <section class="faq-section" id="faq">
+    <div class="faq-inner">
+
+      <div class="faq-header">
+        <span class="faq-eyebrow">Still have doubts?</span>
+        <h2 class="faq-title">Frequently Asked Questions</h2>
+      </div>
+
+      <div class="faq-list">
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            <span class="faq-question-text">Is this course just theory, or does it include practical exercises?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" role="region">
+            <p>Every module includes specific technical exercises and repertoire applications. You'll work on real pieces while applying the scientific principles. Theory without practice is useless — this course is built around actionable drills.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            <span class="faq-question-text">What level do I need to enroll?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" role="region">
+            <p>The course is designed for intermediate to advanced pianists who already have solid technical foundations. If you can play scales fluently and are working on intermediate repertoire (Chopin études, Bach inventions, or equivalent), you're ready.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            <span class="faq-question-text">How long does it take to complete the course?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" role="region">
+            <p>The core content is approximately 8 hours of video. Most students complete it in 3–4 weeks, but you have lifetime access — take as long as you need.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            <span class="faq-question-text">How is this different from traditional conservatory training?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" role="region">
+            <p>Traditional training focuses on repertoire and interpretation. This course focuses on <em>how you learn</em> — neuroscience, motor learning, deliberate practice, and performance psychology. It's not a replacement for lessons; it's the missing manual for effective practice.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            <span class="faq-question-text">Will I receive a certificate?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" role="region">
+            <p>No. This is not an accredited program. The value is in the method, not a piece of paper.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            <span class="faq-question-text">Do I get lifetime access?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" role="region">
+            <p>Yes. Pay once, access forever. All future updates are included.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            <span class="faq-question-text">I've been playing for 20 years. Is this still relevant?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" role="region">
+            <p>Especially relevant. Advanced pianists often hit plateaus because they've automated inefficient patterns. This course teaches you how to rewire motor programs and break through stagnation.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false">
+            <span class="faq-question-text">How can I be sure this works?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer" role="region">
+            <p>The methods are based on peer-reviewed research in motor learning and neuroscience. You can verify every claim. We cite sources, not testimonials.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- Final CTA section -->
   <section class="cta-final-section" id="waitlist">
     <div class="cta-final-glow"></div>
@@ -2157,6 +2492,49 @@
       </div>
     </div>
   </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-brand-row">
+            <img src="brand-assets/logo.png" alt="PianoPro">
+            <span class="footer-brand-name">PianoPro</span>
+          </div>
+          <span class="footer-vat">P. IVA 07127140825</span>
+        </div>
+
+        <div class="footer-legal">
+          <a href="https://www.iubenda.com/privacy-policy/43134838" class="iubenda-white iubenda-noiframe iubenda-embed" title="Privacy Policy">Privacy Policy</a>
+          <span class="footer-legal-sep">•</span>
+          <a href="https://www.iubenda.com/privacy-policy/43134838/cookie-policy" class="iubenda-white iubenda-noiframe iubenda-embed" title="Cookie Policy">Cookie Policy</a>
+          <span class="footer-legal-sep">•</span>
+          <a href="https://www.iubenda.com/terms-and-conditions/43134838" class="iubenda-white no-brand iubenda-noiframe iubenda-embed" title="Terms and Conditions">Terms and Conditions</a>
+        </div>
+      </div>
+
+      <div class="footer-divider"></div>
+
+      <p class="footer-copyright">© 2026 PianoPro. All rights reserved.</p>
+
+    </div>
+  </footer>
+
+  <!-- Iubenda loader — single instance -->
+  <script type="text/javascript">
+  (function (w,d) {
+    var loader = function () {
+      var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0];
+      s.src = "https://cdn.iubenda.com/iubenda.js";
+      tag.parentNode.insertBefore(s, tag);
+    };
+    if (w.addEventListener) { w.addEventListener("load", loader, false); }
+    else if (w.attachEvent) { w.attachEvent("onload", loader); }
+    else { w.onload = loader; }
+  })(window, document);
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -2399,6 +2777,24 @@
         }
       });
     })();
+  </script>
+
+  <script>
+    // FAQ accordion
+    document.querySelectorAll('.faq-question').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var item = btn.closest('.faq-item');
+        var isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item.open').forEach(function(el) {
+          el.classList.remove('open');
+          el.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        });
+        if (!isOpen) {
+          item.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
   </script>
 
 </body>
