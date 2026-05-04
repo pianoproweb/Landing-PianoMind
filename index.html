@@ -767,7 +767,8 @@
       .authority-title   { font-size: 34px; }
       .authority-grid    {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
+        max-width: 800px;
         gap: 28px;
         align-items: start;
       }
@@ -1311,8 +1312,9 @@
     .cta-final-subheadline em {
       font-family: 'Playfair Display', serif;
       font-style: italic;
-      color: var(--accent);
-      font-weight: 400;
+      color: #D4A574;
+      font-weight: 700;
+      font-size: 17px;
     }
 
     /* Social proof bar */
@@ -1360,7 +1362,9 @@
     .cta-final-benefit-text em {
       font-family: 'Playfair Display', serif;
       font-style: italic;
-      font-weight: 400;
+      font-weight: 700;
+      color: #D4A574;
+      font-size: 16px;
     }
 
     @media (min-width: 768px) {
@@ -1420,10 +1424,10 @@
       text-transform: uppercase;
       cursor: pointer;
       box-shadow:
-        0 0 48px rgba(232, 224, 208, 0.38),
-        0 0 110px rgba(232, 224, 208, 0.22),
-        0 0 180px rgba(232, 224, 208, 0.1),
-        inset 0 0 32px rgba(232, 224, 208, 0.1);
+        0 0 48px rgba(232, 224, 208, 0.23),
+        0 0 110px rgba(232, 224, 208, 0.13),
+        0 0 180px rgba(232, 224, 208, 0.06),
+        inset 0 0 32px rgba(232, 224, 208, 0.06);
       animation: ctaPulse 3.6s ease-in-out infinite;
       transition: box-shadow 0.42s ease, background 0.42s ease, border-color 0.42s ease, transform 0.32s ease;
     }
@@ -1431,17 +1435,17 @@
     @keyframes ctaPulse {
       0%, 100% {
         box-shadow:
-          0 0 48px rgba(232, 224, 208, 0.38),
-          0 0 110px rgba(232, 224, 208, 0.22),
-          0 0 180px rgba(232, 224, 208, 0.1),
-          inset 0 0 32px rgba(232, 224, 208, 0.1);
+          0 0 48px rgba(232, 224, 208, 0.23),
+          0 0 110px rgba(232, 224, 208, 0.13),
+          0 0 180px rgba(232, 224, 208, 0.06),
+          inset 0 0 32px rgba(232, 224, 208, 0.06);
       }
       50% {
         box-shadow:
-          0 0 64px rgba(232, 224, 208, 0.5),
-          0 0 140px rgba(232, 224, 208, 0.3),
-          0 0 220px rgba(232, 224, 208, 0.14),
-          inset 0 0 40px rgba(232, 224, 208, 0.14);
+          0 0 64px rgba(232, 224, 208, 0.30),
+          0 0 140px rgba(232, 224, 208, 0.18),
+          0 0 220px rgba(232, 224, 208, 0.08),
+          inset 0 0 40px rgba(232, 224, 208, 0.08);
       }
     }
 
@@ -1450,10 +1454,10 @@
       border-color: rgba(232, 224, 208, 0.72);
       transform: translateY(-1px);
       box-shadow:
-        0 0 72px rgba(232, 224, 208, 0.55),
-        0 0 160px rgba(232, 224, 208, 0.32),
-        0 0 240px rgba(232, 224, 208, 0.16),
-        inset 0 0 48px rgba(232, 224, 208, 0.16);
+        0 0 72px rgba(232, 224, 208, 0.33),
+        0 0 160px rgba(232, 224, 208, 0.19),
+        0 0 240px rgba(232, 224, 208, 0.10),
+        inset 0 0 48px rgba(232, 224, 208, 0.10);
     }
 
     .cta-final-btn-arrow {
@@ -1920,8 +1924,8 @@
     </h1>
 
     <p class="hero-sub" id="subheadline">
-      A methodology developed by concert pianists,<br>
-      neuroscientists, and performance psychologists.
+      A science-based approach integrating piano methodology,<br>
+      performance psychology, and neuroscience research.
     </p>
 
     <div class="cta-group" id="cta-group">
@@ -2100,19 +2104,6 @@
         <p class="authority-bio">Former international concert pianist, trained under Emanuel Ax and Peter Serkin. M.Sc. Prevention and Health Psychology. Founding Director of TGR The Green Room. Presented at Weill Cornell Medical Center and the Performing Arts Medicine Association International Symposium. Specialist in performance anxiety, injury prevention, and psychological resilience for musicians.</p>
       </div>
 
-      <!-- Card 3: Mystery neuroscientist -->
-      <div class="authority-card authority-card--mystery">
-        <div class="authority-photo authority-photo--mystery">
-          <span class="authority-photo-initials" style="font-size:18px; opacity:0.3;">···</span>
-        </div>
-        <p class="authority-role">Neuroscience · Cognitive Science</p>
-        <h3 class="authority-name authority-name--blur">Leading Neuroscientist</h3>
-        <p class="authority-bio" style="opacity:0.5;">Name and credentials revealed at launch.</p>
-        <div class="authority-mystery-badge">
-          <span>Revealed at launch</span>
-        </div>
-      </div>
-
     </div>
 
   </section>
@@ -2177,7 +2168,7 @@
           <div class="learn-card-body-inner">
             <div class="learn-card-module"><div class="learn-card-module-dot"></div><p class="learn-card-module-text">The principle of proximal-to-distal force transmission</p></div>
             <div class="learn-card-module"><div class="learn-card-module-dot"></div><p class="learn-card-module-text">Tension patterns that limit velocity and dynamic range</p></div>
-            <div class="learn-card-module"><div class="learn-card-module-dot"></div><p class="learn-card-module-text">The Taubman approach: retraining inefficient movements</p></div>
+            <div class="learn-card-module"><div class="learn-card-module-dot"></div><p class="learn-card-module-text">Biomechanical principles for identifying and retraining inefficient movement patterns</p></div>
             <div class="learn-card-module"><div class="learn-card-module-dot"></div><p class="learn-card-module-text">Injury prevention and sustainable technique</p></div>
           </div>
         </div>
@@ -2435,13 +2426,13 @@
             <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="faq-answer" role="region">
-            <p>The core content is approximately 8 hours of video. Most students complete it in 3–4 weeks, but you have lifetime access — take as long as you need.</p>
+            <p>The course is self-paced. You'll have flexible access to work through material at your own speed.</p>
           </div>
         </div>
 
         <div class="faq-item">
           <button class="faq-question" aria-expanded="false">
-            <span class="faq-question-text">How is this different from traditional conservatory training?</span>
+            <span class="faq-question-text">How is this different from traditional piano instruction?</span>
             <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="faq-answer" role="region">
@@ -2465,7 +2456,7 @@
             <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="faq-answer" role="region">
-            <p>Yes. Pay once, access forever. All future updates are included.</p>
+            <p>Access details will be confirmed at launch. Join the waitlist to receive updates first.</p>
           </div>
         </div>
 
