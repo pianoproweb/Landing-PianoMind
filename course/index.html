@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PianoMind — Course</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── Reset ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #080D1A;
+      --bg2:        #0F1829;
+      --bg3:        #141D2E;
+      --accent:     #E8E0D0;
+      --gold:       #D4A574;
+      --teal:       #1D9E75;
+      --blue:       #1B3A6B;
+      --text:       #F5F0E8;
+      --muted:      #A0AAB8;
+      --border:     rgba(255,255,255,0.06);
+      --border-hi:  rgba(255,255,255,0.12);
+      --sidebar-w:  368px;
+      --header-h:   62px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* grain */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      background-size: 180px;
+      opacity: 0.028;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ─── Header ─────────────────────────────────────────────── */
+    .hdr {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--header-h);
+      background: rgba(8,13,26,0.94);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 1000;
+    }
+
+    .hdr-left { display: flex; align-items: center; gap: 14px; }
+
+    .hdr-brand {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+    .hdr-brand img {
+      height: 24px; width: auto;
+      filter: brightness(0) invert(1); opacity: 0.82;
+    }
+    .hdr-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px; font-weight: 500; color: var(--text);
+    }
+    .hdr-sep { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
+    .hdr-course {
+      font-family: 'DM Mono', monospace;
+      font-size: 9.5px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted); opacity: 0.6;
+    }
+
+    /* Hamburger (mobile only) */
+    .hdr-menu-btn {
+      display: none;
+      align-items: center; justify-content: center;
+      width: 34px; height: 34px;
+      border: 1px solid var(--border); border-radius: 8px;
+      background: none; color: var(--muted); cursor: pointer;
+      transition: border-color .25s, color .25s;
+    }
+    .hdr-menu-btn:hover { border-color: var(--border-hi); color: var(--text); }
+
+    /* Progress */
+    .hdr-progress { display: flex; align-items: center; gap: 12px; }
+    .hdr-progress-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px; letter-spacing: 0.1em;
+      color: var(--muted); white-space: nowrap;
+    }
+    .hdr-progress-track {
+      width: 110px; height: 3px;
+      background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden;
+    }
+    .hdr-progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--teal), #28C78F);
+      border-radius: 99px; transition: width .7s ease;
+    }
+    .hdr-progress-pct {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; color: var(--teal);
+      letter-spacing: 0.06em; min-width: 30px; text-align: right;
+    }
+
+    /* ─── Layout shell ───────────────────────────────────────── */
+    .layout {
+      display: flex;
+      height: 100vh;
+      padding-top: var(--header-h);
+    }
+
+    /* ─── Sidebar ────────────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      height: calc(100vh - var(--header-h));
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.07) transparent;
+      position: relative; z-index: 100;
+      transition: transform .36s cubic-bezier(.4,0,.2,1);
+    }
+    .sidebar::-webkit-scrollbar { width: 3px; }
+    .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); border-radius: 2px; }
+
+    /* Sidebar top summary */
+    .sidebar-summary {
+      padding: 20px 24px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-summary-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 8.5px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--muted); opacity: 0.45;
+      margin-bottom: 10px;
+    }
+    .sidebar-summary-stats {
+      display: flex; align-items: center; gap: 18px;
+    }
+    .sidebar-stat {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .sidebar-stat-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 15px; color: var(--text); letter-spacing: -0.02em;
+    }
+    .sidebar-stat-key {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px; color: var(--muted); opacity: 0.45; font-weight: 300;
+    }
+    .sidebar-stat-sep {
+      width: 1px; height: 28px; background: var(--border); flex-shrink: 0;
+    }
+
+    /* Module */
+    .module { border-bottom: 1px solid var(--border); }
+
+    .module-hdr {
+      display: flex; align-items: center; gap: 12px;
+      padding: 18px 24px; cursor: pointer;
+      transition: background .2s; user-select: none;
+    }
+    .module-hdr:hover { background: rgba(255,255,255,0.02); }
+
+    .module-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 8.5px; color: var(--muted);
+      letter-spacing: 0.12em; opacity: 0.4; flex-shrink: 0; width: 18px;
+    }
+    .module-info { flex: 1; min-width: 0; }
+    .module-title-text {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10.5px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 3px;
+    }
+    .module-meta-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 8.5px; color: var(--muted);
+      opacity: 0.38; letter-spacing: 0.06em;
+    }
+
+    /* Tiny ring progress */
+    .module-ring { flex-shrink: 0; }
+    .module-ring svg { display: block; }
+    .ring-bg { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 1.6; }
+    .ring-fill {
+      fill: none; stroke: var(--teal); stroke-width: 1.6;
+      stroke-linecap: round;
+      transform-origin: center; transform: rotate(-90deg);
+      transition: stroke-dashoffset .6s ease, stroke .4s;
+    }
+
+    .module-chevron {
+      width: 12px; height: 12px; flex-shrink: 0;
+      color: var(--muted); opacity: 0.35;
+      transition: transform .3s ease, opacity .25s;
+    }
+    .module-hdr:hover .module-chevron { opacity: 0.65; }
+    .module.is-closed .module-chevron { transform: rotate(-90deg); }
+
+    /* Video list */
+    .module-videos {
+      overflow: hidden;
+      max-height: 2400px;
+      transition: max-height .38s ease;
+    }
+    .module.is-closed .module-videos { max-height: 0; }
+
+    /* Video item */
+    .vi {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 24px 12px 20px;
+      border-left: 2px solid transparent;
+      cursor: pointer;
+      transition: background .18s, border-color .18s;
+      position: relative;
+    }
+    .vi:hover:not(.vi--locked) {
+      background: rgba(255,255,255,0.025);
+      border-left-color: rgba(255,255,255,0.09);
+    }
+    .vi.vi--active {
+      background: rgba(29,158,117,0.07);
+      border-left-color: var(--teal);
+    }
+    .vi.vi--locked { cursor: not-allowed; opacity: 0.38; }
+    .vi.vi--locked:hover { background: none; border-left-color: transparent; }
+    .vi.vi--done .vi-icon { color: var(--teal) !important; opacity: 1 !important; }
+
+    /* Icon column */
+    .vi-icon {
+      flex-shrink: 0;
+      width: 16px; height: 16px; margin-top: 1px;
+      color: var(--muted); opacity: 0.45;
+      transition: color .25s, opacity .25s;
+    }
+    .vi:not(.vi--locked):hover .vi-icon { opacity: 0.85; }
+    .vi.vi--active .vi-icon { color: var(--teal) !important; opacity: 1 !important; }
+
+    /* Content column */
+    .vi-body { flex: 1; min-width: 0; }
+    .vi-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 7.5px; letter-spacing: 0.1em;
+      color: var(--muted); opacity: 0.35; margin-bottom: 2px;
+    }
+    .vi-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px; font-weight: 400; line-height: 1.45;
+      color: var(--text); opacity: 0.82;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 3px;
+    }
+    .vi.vi--locked .vi-title { opacity: 0.4; }
+    .vi.vi--active .vi-title { opacity: 1; }
+    .vi-dur {
+      font-family: 'DM Mono', monospace;
+      font-size: 8.5px; color: var(--muted); opacity: 0.38; letter-spacing: 0.06em;
+    }
+    .vi-bar {
+      height: 2px; background: rgba(255,255,255,0.05);
+      border-radius: 1px; overflow: hidden; margin-top: 5px;
+    }
+    .vi-bar-fill {
+      height: 100%; background: var(--teal); border-radius: 1px;
+      transition: width .5s ease;
+    }
+    .vi-lock-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 7.5px; color: var(--gold);
+      letter-spacing: 0.08em; opacity: 0.65; margin-top: 4px;
+    }
+
+    /* ─── Main area ──────────────────────────────────────────── */
+    .main {
+      flex: 1; min-width: 0;
+      height: calc(100vh - var(--header-h));
+      overflow-y: auto; overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.06) transparent;
+    }
+    .main::-webkit-scrollbar { width: 4px; }
+    .main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 2px; }
+
+    /* ─── Player ─────────────────────────────────────────────── */
+    .player-section { background: #000; position: relative; }
+
+    .player-ratio {
+      width: 100%; aspect-ratio: 16/9;
+      position: relative; background: #070B16; overflow: hidden;
+    }
+
+    .player-ratio iframe {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; border: none;
+      display: none;
+    }
+
+    /* Welcome */
+    .player-welcome {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 14px;
+      background: #070B16;
+    }
+    .player-welcome-ring {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .player-welcome-text {
+      font-family: 'Playfair Display', serif;
+      font-style: italic; font-size: 16px;
+      color: rgba(255,255,255,0.2); font-weight: 400;
+    }
+
+    /* Locked overlay */
+    .player-locked {
+      position: absolute; inset: 0;
+      background: rgba(8,13,26,0.92);
+      backdrop-filter: blur(10px);
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
+    }
+    .player-locked-icon { font-size: 28px; opacity: 0.45; }
+    .player-locked-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px; font-weight: 500; color: var(--text); opacity: 0.55;
+    }
+    .player-locked-sub {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 300;
+      color: var(--muted); opacity: 0.5; text-align: center; max-width: 280px;
+    }
+
+    /* ─── Video meta ─────────────────────────────────────────── */
+    .vmeta {
+      padding: 24px 28px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .vmeta-module {
+      font-family: 'DM Mono', monospace;
+      font-size: 8.5px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--muted); opacity: 0.5;
+      margin-bottom: 8px;
+    }
+    .vmeta-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(18px,2vw,26px);
+      font-weight: 500; line-height: 1.28;
+      color: var(--text); letter-spacing: -0.01em; margin-bottom: 8px;
+    }
+    .vmeta-instructor {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 300;
+      color: var(--muted); opacity: 0.6; margin-bottom: 16px;
+    }
+    .vmeta-progress-row { display: flex; align-items: center; gap: 12px; }
+    .vmeta-bar {
+      width: 220px; height: 2px;
+      background: rgba(255,255,255,0.07); border-radius: 1px; overflow: hidden;
+    }
+    .vmeta-bar-fill {
+      height: 100%; background: var(--teal);
+      border-radius: 1px; transition: width .5s ease; width: 0%;
+    }
+    .vmeta-pct {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px; color: var(--muted); opacity: 0.55; letter-spacing: 0.08em;
+    }
+
+    /* ─── Next video bar ─────────────────────────────────────── */
+    .next-bar {
+      display: none;
+      align-items: center; justify-content: space-between;
+      gap: 16px; padding: 16px 28px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(29,158,117,0.04);
+    }
+    .next-bar.is-visible { display: flex; }
+    .next-bar-left { flex: 1; min-width: 0; }
+    .next-bar-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 8px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--teal); opacity: 0.6; margin-bottom: 3px;
+    }
+    .next-bar-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px; color: var(--text); opacity: 0.75;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .next-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 20px; border-radius: 99px;
+      border: 1px solid rgba(29,158,117,0.32);
+      background: rgba(29,158,117,0.08);
+      color: var(--teal);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11.5px; font-weight: 500; letter-spacing: 0.04em;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: background .25s, border-color .25s;
+    }
+    .next-btn:hover {
+      background: rgba(29,158,117,0.15);
+      border-color: rgba(29,158,117,0.52);
+    }
+
+    /* ─── Course complete banner ─────────────────────────────── */
+    .complete-banner {
+      display: none;
+      flex-direction: column; align-items: center;
+      padding: 40px 28px; text-align: center; gap: 10px;
+    }
+    .complete-banner.is-visible { display: flex; }
+    .complete-banner-icon { font-size: 32px; margin-bottom: 4px; }
+    .complete-banner-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 500; color: var(--text); font-style: italic;
+    }
+    .complete-banner-sub {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 300; color: var(--muted); opacity: 0.65;
+    }
+
+    /* ─── Mobile sidebar backdrop ────────────────────────────── */
+    .sidebar-backdrop {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.72); z-index: 490;
+      opacity: 0; transition: opacity .3s;
+    }
+    .sidebar-backdrop.is-visible {
+      display: block; opacity: 1;
+    }
+
+    /* ─── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 1023px) {
+      :root { --sidebar-w: 320px; }
+    }
+
+    @media (max-width: 767px) {
+      :root { --sidebar-w: 100%; }
+
+      .hdr { padding: 0 16px; }
+      .hdr-sep, .hdr-course { display: none; }
+      .hdr-progress-track { width: 70px; }
+      .hdr-menu-btn { display: flex; }
+
+      .sidebar {
+        position: fixed;
+        top: var(--header-h); left: 0;
+        width: min(360px, 90vw);
+        height: calc(100vh - var(--header-h));
+        z-index: 500;
+        transform: translateX(-100%);
+      }
+      .sidebar.is-open { transform: translateX(0); }
+
+      .main { height: calc(100vh - var(--header-h)); }
+
+      .vmeta { padding: 18px 16px 16px; }
+      .next-bar { padding: 14px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Mobile sidebar backdrop -->
+<div class="sidebar-backdrop" id="backdrop"></div>
+
+<!-- ─ Header ──────────────────────────────────────────────────────── -->
+<header class="hdr">
+  <div class="hdr-left">
+    <button class="hdr-menu-btn" id="menuBtn" aria-label="Toggle curriculum">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <line x1="1" y1="3.5" x2="14" y2="3.5"/>
+        <line x1="1" y1="7.5" x2="14" y2="7.5"/>
+        <line x1="1" y1="11.5" x2="14" y2="11.5"/>
+      </svg>
+    </button>
+    <a href="../" class="hdr-brand">
+      <img src="../brand-assets/logo.png" alt="PianoPro"
+           onerror="this.style.display='none'">
+      <span class="hdr-brand-name">PianoPro</span>
+    </a>
+    <div class="hdr-sep"></div>
+    <span class="hdr-course">PianoMind</span>
+  </div>
+  <div class="hdr-progress">
+    <span class="hdr-progress-label">Progress</span>
+    <div class="hdr-progress-track">
+      <div class="hdr-progress-fill" id="hdrFill"></div>
+    </div>
+    <span class="hdr-progress-pct" id="hdrPct">0%</span>
+  </div>
+</header>
+
+<!-- ─ Layout ──────────────────────────────────────────────────────── -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <!-- Main -->
+  <main class="main" id="mainArea">
+
+    <!-- Player -->
+    <div class="player-section">
+      <div class="player-ratio" id="playerRatio">
+
+        <!-- Welcome state -->
+        <div class="player-welcome" id="playerWelcome">
+          <div class="player-welcome-ring">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <circle cx="11" cy="11" r="9" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+              <polygon points="9,7 17,11 9,15" fill="rgba(255,255,255,0.22)"/>
+            </svg>
+          </div>
+          <p class="player-welcome-text">Select a lesson to begin</p>
+        </div>
+
+        <!-- Video iframe -->
+        <iframe id="player" src="" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowfullscreen></iframe>
+
+        <!-- Locked overlay -->
+        <div class="player-locked" id="playerLocked">
+          <div class="player-locked-icon">🔒</div>
+          <p class="player-locked-title">Lesson locked</p>
+          <p class="player-locked-sub" id="lockedMsg">Complete the previous lesson to unlock this one.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Video metadata -->
+    <div class="vmeta" id="vmeta" style="display:none"></div>
+
+    <!-- Next video bar -->
+    <div class="next-bar" id="nextBar">
+      <div class="next-bar-left">
+        <div class="next-bar-label">Up next</div>
+        <div class="next-bar-title" id="nextTitle"></div>
+      </div>
+      <button class="next-btn" id="nextBtn">Continue →</button>
+    </div>
+
+    <!-- Course complete banner -->
+    <div class="complete-banner" id="completeBanner">
+      <div class="complete-banner-icon">🎹</div>
+      <p class="complete-banner-title">Course complete.</p>
+      <p class="complete-banner-sub">You've completed all lessons in PianoMind.</p>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   CONFIGURATION — replace BUNNY_LIB and each bunnyId before launch
+═══════════════════════════════════════════════════════════════════ */
+const BUNNY_LIB       = 'YOUR_LIBRARY_ID';    // ← replace with Bunny Stream library ID
+const STORAGE_KEY     = 'pm_progress_v1';
+const LAST_KEY        = 'pm_last_v1';
+const UNLOCK_PCT      = 80;                   // percent watched to unlock next lesson
+const SAVE_INTERVAL   = 10_000;               // ms between localStorage saves
+
+const COURSE = [
+  {
+    id: 'm1', num: '01', title: 'Performance Psychology',
+    instructor: "Heather O'Donnell",
+    videos: [
+      { id:'v1_1', bId:'PLACEHOLDER_1_1', title:'Cultivating the Zone',         dur:720,  durStr:'12:00' },
+      { id:'v1_2', bId:'PLACEHOLDER_1_2', title:'ACT and Flexibility',          dur:900,  durStr:'15:00' },
+      { id:'v1_3', bId:'PLACEHOLDER_1_3', title:'Self-talk Strategies',         dur:600,  durStr:'10:00' },
+      { id:'v1_4', bId:'PLACEHOLDER_1_4', title:'Imagery and Exposure',         dur:1080, durStr:'18:00' },
+      { id:'v1_5', bId:'PLACEHOLDER_1_5', title:'Career Alignment',             dur:840,  durStr:'14:00' },
+    ]
+  },
+  {
+    id: 'm2', num: '02', title: 'Neuroscience',
+    instructor: 'Michelangelo Salamone',
+    videos: [
+      { id:'v2_1', bId:'PLACEHOLDER_2_1', title:'State-dependent Learning',     dur:960,  durStr:'16:00' },
+      { id:'v2_2', bId:'PLACEHOLDER_2_2', title:'Memory Encoding',              dur:1200, durStr:'20:00' },
+      { id:'v2_3', bId:'PLACEHOLDER_2_3', title:'Autonomic Control',            dur:720,  durStr:'12:00' },
+    ]
+  },
+  {
+    id: 'm3', num: '03', title: 'Biomechanics',
+    instructor: 'Michelangelo Salamone',
+    videos: [
+      { id:'v3_1', bId:'PLACEHOLDER_3_1', title:'Force Distribution',           dur:1080, durStr:'18:00' },
+      { id:'v3_2', bId:'PLACEHOLDER_3_2', title:'Injury Prevention',            dur:900,  durStr:'15:00' },
+      { id:'v3_3', bId:'PLACEHOLDER_3_3', title:'Movement Economy',             dur:840,  durStr:'14:00' },
+    ]
+  },
+  {
+    id: 'm4', num: '04', title: 'Methodology',
+    instructor: 'Michelangelo Salamone',
+    videos: [
+      { id:'v4_1', bId:'PLACEHOLDER_4_1', title:'Passage Protocol',             dur:1320, durStr:'22:00' },
+      { id:'v4_2', bId:'PLACEHOLDER_4_2', title:'Context-Independent Practice', dur:960,  durStr:'16:00' },
+      { id:'v4_3', bId:'PLACEHOLDER_4_3', title:'Performance Simulation',       dur:720,  durStr:'12:00' },
+    ]
+  }
+];
+
+/* ── Flatten videos with back-reference ──────────────────────── */
+const VIDEOS = [];
+COURSE.forEach(m => m.videos.forEach(v => { v._m = m; VIDEOS.push(v); }));
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════════ */
+let prog    = {};    // { [id]: { currentTime, duration, pct } }
+let active  = null;  // currently loaded videoId (may be locked)
+let playing = null;  // actually playing videoId
+
+/* ── Persistence ─────────────────────────────────────────────── */
+function loadProg() {
+  try { prog = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { prog = {}; }
+}
+function saveProg() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(prog)); } catch {}
+}
+function getProg(id) {
+  return prog[id] || { currentTime: 0, duration: 0, pct: 0 };
+}
+
+/* ── Unlock logic ────────────────────────────────────────────── */
+function isUnlocked(id) {
+  const idx = VIDEOS.findIndex(v => v.id === id);
+  if (idx <= 0) return true;
+  return getProg(VIDEOS[idx - 1].id).pct >= UNLOCK_PCT;
+}
+function prevVideo(id) {
+  const idx = VIDEOS.findIndex(v => v.id === id);
+  return idx > 0 ? VIDEOS[idx - 1] : null;
+}
+function nextVideo(id) {
+  const idx = VIDEOS.findIndex(v => v.id === id);
+  return idx >= 0 && idx < VIDEOS.length - 1 ? VIDEOS[idx + 1] : null;
+}
+
+/* ── Overall progress ────────────────────────────────────────── */
+function overallPct() {
+  const done = VIDEOS.filter(v => getProg(v.id).pct >= UNLOCK_PCT).length;
+  return Math.round((done / VIDEOS.length) * 100);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SIDEBAR RENDERING
+═══════════════════════════════════════════════════════════════════ */
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+
+  /* summary strip */
+  const totalSecs = VIDEOS.reduce((s, v) => s + v.dur, 0);
+  const h = Math.floor(totalSecs / 3600);
+  const m = Math.floor((totalSecs % 3600) / 60);
+  const doneCount = VIDEOS.filter(v => getProg(v.id).pct >= UNLOCK_PCT).length;
+
+  const summary = document.createElement('div');
+  summary.className = 'sidebar-summary';
+  summary.innerHTML = `
+    <div class="sidebar-summary-label">PianoMind</div>
+    <div class="sidebar-summary-stats">
+      <div class="sidebar-stat">
+        <span class="sidebar-stat-val">${VIDEOS.length}</span>
+        <span class="sidebar-stat-key">lessons</span>
+      </div>
+      <div class="sidebar-stat-sep"></div>
+      <div class="sidebar-stat">
+        <span class="sidebar-stat-val">${h}h ${m}m</span>
+        <span class="sidebar-stat-key">total</span>
+      </div>
+      <div class="sidebar-stat-sep"></div>
+      <div class="sidebar-stat" id="sbDoneStat">
+        <span class="sidebar-stat-val">${doneCount}</span>
+        <span class="sidebar-stat-key">completed</span>
+      </div>
+    </div>`;
+  sb.appendChild(summary);
+
+  COURSE.forEach(mod => {
+    const modEl = document.createElement('div');
+    modEl.className = 'module';
+    modEl.id = 'mod-' + mod.id;
+
+    const modSecs  = mod.videos.reduce((s, v) => s + v.dur, 0);
+    const modH     = Math.floor(modSecs / 3600);
+    const modM     = Math.floor((modSecs % 3600) / 60);
+    const modLabel = modH > 0 ? `${modH}h ${modM}m` : `${modM}m`;
+    const modDone  = mod.videos.filter(v => getProg(v.id).pct >= UNLOCK_PCT).length;
+    const ringPct  = Math.round((modDone / mod.videos.length) * 100);
+    const R = 10, C = 2 * Math.PI * R;
+
+    modEl.innerHTML = `
+      <div class="module-hdr" id="modhdr-${mod.id}">
+        <span class="module-num">${mod.num}</span>
+        <div class="module-info">
+          <div class="module-title-text">${mod.title}</div>
+          <div class="module-meta-text">${mod.videos.length} lessons · ${modLabel}</div>
+        </div>
+        <div class="module-ring">
+          <svg width="26" height="26" viewBox="0 0 26 26">
+            <circle class="ring-bg" cx="13" cy="13" r="${R}"/>
+            <circle class="ring-fill" id="ring-${mod.id}" cx="13" cy="13" r="${R}"
+              stroke-dasharray="${C.toFixed(2)}"
+              stroke-dashoffset="${(C - C * ringPct / 100).toFixed(2)}"
+              style="stroke:${ringPct > 0 ? 'var(--teal)' : 'rgba(255,255,255,0.06)'}"/>
+          </svg>
+        </div>
+        <svg class="module-chevron" viewBox="0 0 12 12" fill="none"
+             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="2,4.5 6,7.5 10,4.5"/>
+        </svg>
+      </div>
+      <div class="module-videos" id="mvids-${mod.id}"></div>`;
+
+    sb.appendChild(modEl);
+
+    document.getElementById('modhdr-' + mod.id)
+      .addEventListener('click', () => toggleModule(mod.id));
+
+    const vidsEl = document.getElementById('mvids-' + mod.id);
+    mod.videos.forEach(v => vidsEl.appendChild(makeVideoItem(v)));
+  });
+}
+
+function makeVideoItem(video) {
+  const el = document.createElement('div');
+  el.className = 'vi';
+  el.id = 'vi-' + video.id;
+  el.addEventListener('click', () => handleVideoClick(video.id));
+  syncVideoItem(el, video);
+  return el;
+}
+
+function syncVideoItem(el, video) {
+  const p        = getProg(video.id);
+  const unlocked = isUnlocked(video.id);
+  const done     = p.pct >= UNLOCK_PCT;
+  const inProg   = p.pct > 0 && !done;
+  const isActive = active === video.id;
+
+  el.className = 'vi'
+    + (isActive  ? ' vi--active'  : '')
+    + (!unlocked ? ' vi--locked'  : '')
+    + (done      ? ' vi--done'    : '');
+
+  /* icon */
+  let icon = '';
+  if (!unlocked) {
+    icon = `<svg class="vi-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3.5" y="7" width="9" height="7.5" rx="1.2"/>
+      <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/>
+    </svg>`;
+  } else if (done) {
+    icon = `<svg class="vi-icon" viewBox="0 0 16 16" fill="none" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="8" cy="8" r="6.2"/>
+      <polyline points="5,8.5 7,10.5 11,6.5"/>
+    </svg>`;
+  } else if (isActive) {
+    icon = `<svg class="vi-icon" viewBox="0 0 16 16" fill="var(--teal)">
+      <circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--teal)" stroke-width="1.3"/>
+      <polygon points="6.5,5.5 12,8 6.5,10.5"/>
+    </svg>`;
+  } else {
+    icon = `<svg class="vi-icon" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.3"/>
+      <polygon points="6.5,5.5 12,8 6.5,10.5" fill="currentColor" opacity="0.45"/>
+    </svg>`;
+  }
+
+  /* lesson label: e.g. "1.1" from "v1_1" */
+  const label = video.id.replace('v','').replace('_','.');
+
+  /* progress mini-bar (only when in progress or done) */
+  const bar = (unlocked && p.pct > 0)
+    ? `<div class="vi-bar"><div class="vi-bar-fill" style="width:${Math.round(p.pct)}%"></div></div>`
+    : '';
+
+  /* lock hint */
+  const hint = !unlocked
+    ? `<div class="vi-lock-hint">Watch previous lesson to unlock</div>`
+    : '';
+
+  el.innerHTML = `
+    ${icon}
+    <div class="vi-body">
+      <div class="vi-label">${label}</div>
+      <div class="vi-title">${video.title}</div>
+      <div class="vi-dur">${video.durStr}</div>
+      ${bar}
+      ${hint}
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MODULE COLLAPSE
+═══════════════════════════════════════════════════════════════════ */
+function toggleModule(id) {
+  document.getElementById('mod-' + id).classList.toggle('is-closed');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VIDEO INTERACTION
+═══════════════════════════════════════════════════════════════════ */
+function handleVideoClick(id) {
+  if (!isUnlocked(id)) {
+    showLocked(id);
+  } else {
+    loadVideo(id);
+  }
+  closeSidebar();
+}
+
+function showLocked(id) {
+  active = id;
+  const prev = prevVideo(id);
+  document.getElementById('lockedMsg').textContent =
+    prev ? `Complete "${prev.title}" to unlock this lesson.`
+         : 'Complete the previous lesson to unlock this one.';
+  document.getElementById('player').style.display    = 'none';
+  document.getElementById('playerWelcome').style.display = 'none';
+  document.getElementById('playerLocked').style.display  = 'flex';
+  document.getElementById('vmeta').style.display = 'none';
+  refreshAllItems();
+}
+
+function loadVideo(id) {
+  const video = VIDEOS.find(v => v.id === id);
+  if (!video) return;
+
+  active  = id;
+  playing = id;
+
+  const p       = getProg(id);
+  const startT  = Math.floor(p.currentTime || 0);
+  const params  = `autoplay=true&responsive=true&preload=true${startT > 5 ? '&t=' + startT : ''}`;
+  const src     = `https://iframe.mediadelivery.net/embed/${BUNNY_LIB}/${video.bId}?${params}`;
+
+  const iframe = document.getElementById('player');
+  iframe.src   = src;
+  iframe.style.display = 'block';
+  document.getElementById('playerWelcome').style.display = 'none';
+  document.getElementById('playerLocked').style.display  = 'none';
+
+  renderVMeta(video);
+  refreshAllItems();
+  updateNextBar(id);
+  updateHeaderProgress();
+
+  /* scroll player into view on mobile */
+  document.getElementById('mainArea').scrollTo({ top: 0, behavior: 'smooth' });
+
+  /* ensure sidebar item is visible */
+  const el = document.getElementById('vi-' + id);
+  if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+  /* make sure parent module is open */
+  const modEl = document.getElementById('mod-' + video._m.id);
+  if (modEl && modEl.classList.contains('is-closed')) modEl.classList.remove('is-closed');
+}
+
+/* ─── Video metadata panel ───────────────────────────────────── */
+function renderVMeta(video) {
+  const p   = getProg(video.id);
+  const el  = document.getElementById('vmeta');
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div class="vmeta-module">Module ${video._m.num} — ${video._m.title}</div>
+    <h1 class="vmeta-title">${video.title}</h1>
+    <p class="vmeta-instructor">with ${video._m.instructor}</p>
+    <div class="vmeta-progress-row">
+      <div class="vmeta-bar">
+        <div class="vmeta-bar-fill" id="vmetaFill" style="width:${Math.round(p.pct)}%"></div>
+      </div>
+      <span class="vmeta-pct" id="vmetaPct">${Math.round(p.pct)}% watched</span>
+    </div>`;
+}
+
+function updateVMetaPct(pct) {
+  const fill = document.getElementById('vmetaFill');
+  const pctEl = document.getElementById('vmetaPct');
+  if (fill)  fill.style.width   = Math.round(pct) + '%';
+  if (pctEl) pctEl.textContent  = Math.round(pct) + '% watched';
+}
+
+/* ─── Next bar ───────────────────────────────────────────────── */
+function updateNextBar(id) {
+  const next     = nextVideo(id);
+  const bar      = document.getElementById('nextBar');
+  const complete = document.getElementById('completeBanner');
+
+  if (next) {
+    document.getElementById('nextTitle').textContent = next.title;
+    document.getElementById('nextBtn').onclick = () => handleVideoClick(next.id);
+    bar.classList.add('is-visible');
+    complete.classList.remove('is-visible');
+  } else {
+    bar.classList.remove('is-visible');
+    /* show complete banner only if all videos done */
+    const allDone = VIDEOS.every(v => getProg(v.id).pct >= UNLOCK_PCT);
+    complete.classList.toggle('is-visible', allDone);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BUNNY STREAM POSTMESSAGE TRACKING
+═══════════════════════════════════════════════════════════════════ */
+window.addEventListener('message', function(e) {
+  /* accept only Bunny's CDN origin */
+  if (!e.origin || !e.origin.includes('mediadelivery.net')) return;
+  const d = e.data;
+  if (!d || !d.event) return;
+
+  const evt = d.event.toLowerCase();
+
+  if (evt === 'timeupdate' || evt === 'timeupdate') {
+    const t   = d.seconds    ?? d.currentTime ?? 0;
+    const dur = d.duration   ?? 0;
+    onTimeUpdate(t, dur);
+  } else if (evt === 'ended') {
+    onEnded();
+  }
+});
+
+function onTimeUpdate(t, dur) {
+  if (!playing) return;
+  const pct      = dur > 0 ? (t / dur) * 100 : 0;
+  const existing = getProg(playing);
+
+  prog[playing] = {
+    currentTime: t,
+    duration:    dur,
+    pct:         Math.max(pct, existing.pct)  /* never go backwards */
+  };
+
+  updateVMetaPct(pct);
+  updateSidebarBar(playing, Math.round(pct));
+
+  if (pct >= UNLOCK_PCT) onThresholdReached(playing);
+  updateHeaderProgress();
+}
+
+function onEnded() {
+  if (!playing) return;
+  if (!prog[playing]) prog[playing] = { currentTime: 0, duration: 0, pct: 0 };
+  prog[playing].pct = 100;
+  saveProg();
+  refreshAllItems();
+  refreshModuleRings();
+  updateHeaderProgress();
+  updateNextBar(playing);
+}
+
+function onThresholdReached(id) {
+  refreshItem(id);
+  const nxt = nextVideo(id);
+  if (nxt) refreshItem(nxt.id);
+  refreshModuleRings();
+  updateSidebarSummary();
+  updateNextBar(id);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   UI REFRESH HELPERS
+═══════════════════════════════════════════════════════════════════ */
+function refreshItem(id) {
+  const el    = document.getElementById('vi-' + id);
+  const video = VIDEOS.find(v => v.id === id);
+  if (el && video) syncVideoItem(el, video);
+}
+function refreshAllItems() {
+  VIDEOS.forEach(v => refreshItem(v.id));
+}
+
+function updateSidebarBar(id, pct) {
+  const fill = document.querySelector('#vi-' + id + ' .vi-bar-fill');
+  if (fill) {
+    fill.style.width = pct + '%';
+  } else {
+    /* bar might not exist yet (video just started) — re-render item */
+    refreshItem(id);
+  }
+}
+
+function refreshModuleRings() {
+  COURSE.forEach(mod => {
+    const done    = mod.videos.filter(v => getProg(v.id).pct >= UNLOCK_PCT).length;
+    const ringPct = Math.round((done / mod.videos.length) * 100);
+    const R       = 10, C = 2 * Math.PI * R;
+    const ring    = document.getElementById('ring-' + mod.id);
+    if (!ring) return;
+    ring.style.strokeDashoffset = (C - C * ringPct / 100).toFixed(2);
+    ring.style.stroke           = ringPct > 0 ? 'var(--teal)' : 'rgba(255,255,255,0.06)';
+  });
+}
+
+function updateSidebarSummary() {
+  const el = document.getElementById('sbDoneStat');
+  if (el) {
+    const done = VIDEOS.filter(v => getProg(v.id).pct >= UNLOCK_PCT).length;
+    el.querySelector('.sidebar-stat-val').textContent = done;
+  }
+}
+
+function updateHeaderProgress() {
+  const pct = overallPct();
+  document.getElementById('hdrFill').style.width  = pct + '%';
+  document.getElementById('hdrPct').textContent   = pct + '%';
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PERIODIC SAVE — every 10 seconds while something is playing
+═══════════════════════════════════════════════════════════════════ */
+setInterval(() => { if (playing) saveProg(); }, SAVE_INTERVAL);
+
+/* save + store last video on unload */
+window.addEventListener('beforeunload', () => {
+  saveProg();
+  if (active) {
+    try { localStorage.setItem(LAST_KEY, active); } catch {}
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE SIDEBAR
+═══════════════════════════════════════════════════════════════════ */
+document.getElementById('menuBtn').addEventListener('click', toggleSidebar);
+document.getElementById('backdrop').addEventListener('click', closeSidebar);
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('is-open');
+  document.getElementById('backdrop').classList.toggle('is-visible');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('is-open');
+  document.getElementById('backdrop').classList.remove('is-visible');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════════ */
+(function init() {
+  loadProg();
+  renderSidebar();
+  updateHeaderProgress();
+
+  /* resume last video (no autoplay — just pre-select) */
+  try {
+    const last = localStorage.getItem(LAST_KEY);
+    if (last && isUnlocked(last)) {
+      active = last;
+      refreshAllItems();
+      /* show vmeta for context without autoplay */
+      const video = VIDEOS.find(v => v.id === last);
+      if (video) {
+        renderVMeta(video);
+        updateNextBar(last);
+        const el = document.getElementById('vi-' + last);
+        if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
+  } catch {}
+})();
+</script>
+
+</body>
+</html>
