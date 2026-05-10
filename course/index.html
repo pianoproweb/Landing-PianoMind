@@ -4,640 +4,518 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PianoMind — Course</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <script src="https://player.vimeo.com/api/player.js"></script>
   <style>
-    /* ─── Reset ──────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:         #080D1A;
-      --bg2:        #0F1829;
-      --bg3:        #141D2E;
-      --accent:     #E8E0D0;
-      --gold:       #D4A574;
-      --teal:       #1D9E75;
-      --blue:       #1B3A6B;
-      --text:       #F5F0E8;
-      --muted:      #A0AAB8;
-      --border:     rgba(255,255,255,0.06);
-      --border-hi:  rgba(255,255,255,0.12);
-      --sidebar-w:  368px;
-      --header-h:   62px;
+      --navy: #080D1A;
+      --blue: #1B3A6B;
+      --teal: #1D9E75;
+      --gold: #D4A574;
+      --g50:  #F9FAFB;
+      --g100: #F3F4F6;
+      --g200: #E5E7EB;
+      --g400: #9CA3AF;
+      --g500: #6B7280;
+      --g600: #4B5563;
+      --hdr:  60px;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--g50);
+      color: var(--navy);
       font-family: 'DM Sans', sans-serif;
-      height: 100vh;
-      overflow: hidden;
+      min-height: 100vh;
     }
 
-    /* grain */
-    body::after {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-      background-size: 180px;
-      opacity: 0.028;
-      mix-blend-mode: overlay;
-      pointer-events: none;
-      z-index: 9999;
-    }
+    :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
-    /* ─── Header ─────────────────────────────────────────────── */
+    /* ── Header ─────────────────────────────────────────────── */
     .hdr {
-      position: fixed; top: 0; left: 0; right: 0;
-      height: var(--header-h);
-      background: rgba(8,13,26,0.94);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      z-index: 1000;
+      position: fixed; top: 0; left: 0; right: 0; height: var(--hdr);
+      background: var(--navy);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; z-index: 1000;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
+    .hdr-left  { display: flex; align-items: center; gap: 14px; }
+    .hdr-right { display: flex; align-items: center; gap: 12px; }
 
-    .hdr-left { display: flex; align-items: center; gap: 14px; }
-
-    .hdr-brand {
-      display: flex; align-items: center; gap: 10px;
-      text-decoration: none;
-    }
-    .hdr-brand img {
-      height: 24px; width: auto;
-      filter: brightness(0) invert(1); opacity: 0.82;
-    }
-    .hdr-brand-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 15px; font-weight: 500; color: var(--text);
-    }
-    .hdr-sep { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
-    .hdr-course {
-      font-family: 'DM Mono', monospace;
-      font-size: 9.5px; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--muted); opacity: 0.6;
-    }
-
-    /* Hamburger (mobile only) */
     .hdr-menu-btn {
-      display: none;
-      align-items: center; justify-content: center;
-      width: 34px; height: 34px;
-      border: 1px solid var(--border); border-radius: 8px;
-      background: none; color: var(--muted); cursor: pointer;
-      transition: border-color .25s, color .25s;
+      display: none; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: none; color: rgba(255,255,255,0.65); cursor: pointer;
+      transition: border-color .2s, color .2s;
     }
-    .hdr-menu-btn:hover { border-color: var(--border-hi); color: var(--text); }
+    .hdr-menu-btn:hover { border-color: rgba(255,255,255,0.3); color: white; }
 
-    /* Progress */
-    .hdr-progress { display: flex; align-items: center; gap: 12px; }
+    .hdr-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .hdr-brand img { height: 22px; width: auto; filter: brightness(0) invert(1); opacity: 0.85; }
+    .hdr-brand-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500; color: white; }
+    .hdr-sep { width: 1px; height: 14px; background: rgba(255,255,255,0.12); }
+    .hdr-label {
+      font-family: 'DM Mono', monospace; font-size: 9px;
+      letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.38);
+    }
+
+    .hdr-progress { display: flex; align-items: center; gap: 10px; }
     .hdr-progress-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 9px; letter-spacing: 0.1em;
-      color: var(--muted); white-space: nowrap;
+      font-family: 'DM Mono', monospace; font-size: 9px;
+      letter-spacing: 0.1em; color: rgba(255,255,255,0.38); white-space: nowrap;
     }
-    .hdr-progress-track {
-      width: 110px; height: 3px;
-      background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden;
+    .hdr-track {
+      width: 100px; height: 3px;
+      background: rgba(255,255,255,0.1); border-radius: 99px; overflow: hidden;
     }
-    .hdr-progress-fill {
-      height: 100%; width: 0%;
+    .hdr-fill {
+      height: 100%; width: 0%; border-radius: 99px;
       background: linear-gradient(90deg, var(--teal), #28C78F);
-      border-radius: 99px; transition: width .7s ease;
+      transition: width .6s ease;
     }
-    .hdr-progress-pct {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px; color: var(--teal);
-      letter-spacing: 0.06em; min-width: 30px; text-align: right;
+    .hdr-pct {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      color: var(--teal); min-width: 28px; text-align: right;
     }
 
-    /* ─── Layout shell ───────────────────────────────────────── */
+    /* ── Layout grid ─────────────────────────────────────────── */
     .layout {
-      display: flex;
-      height: 100vh;
-      padding-top: var(--header-h);
+      display: grid;
+      grid-template-columns: 65fr 35fr;
+      min-height: calc(100vh - var(--hdr));
+      padding-top: var(--hdr);
     }
 
-    /* ─── Sidebar ────────────────────────────────────────────── */
-    .sidebar {
-      width: var(--sidebar-w);
-      flex-shrink: 0;
-      height: calc(100vh - var(--header-h));
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      overflow-y: auto;
-      overflow-x: hidden;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(255,255,255,0.07) transparent;
-      position: relative; z-index: 100;
-      transition: transform .36s cubic-bezier(.4,0,.2,1);
-    }
-    .sidebar::-webkit-scrollbar { width: 3px; }
-    .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); border-radius: 2px; }
+    /* ── Left column ─────────────────────────────────────────── */
+    .col-main { overflow-y: auto; }
 
-    /* Sidebar top summary */
-    .sidebar-summary {
-      padding: 20px 24px 18px;
-      border-bottom: 1px solid var(--border);
-    }
-    .sidebar-summary-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 8.5px; letter-spacing: 0.16em;
-      text-transform: uppercase; color: var(--muted); opacity: 0.45;
-      margin-bottom: 10px;
-    }
-    .sidebar-summary-stats {
-      display: flex; align-items: center; gap: 18px;
-    }
-    .sidebar-stat {
-      display: flex; flex-direction: column; gap: 2px;
-    }
-    .sidebar-stat-val {
-      font-family: 'DM Mono', monospace;
-      font-size: 15px; color: var(--text); letter-spacing: -0.02em;
-    }
-    .sidebar-stat-key {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 10px; color: var(--muted); opacity: 0.45; font-weight: 300;
-    }
-    .sidebar-stat-sep {
-      width: 1px; height: 28px; background: var(--border); flex-shrink: 0;
-    }
-
-    /* Module */
-    .module { border-bottom: 1px solid var(--border); }
-
-    .module-hdr {
-      display: flex; align-items: center; gap: 12px;
-      padding: 18px 24px; cursor: pointer;
-      transition: background .2s; user-select: none;
-    }
-    .module-hdr:hover { background: rgba(255,255,255,0.02); }
-
-    .module-num {
-      font-family: 'DM Mono', monospace;
-      font-size: 8.5px; color: var(--muted);
-      letter-spacing: 0.12em; opacity: 0.4; flex-shrink: 0; width: 18px;
-    }
-    .module-info { flex: 1; min-width: 0; }
-    .module-title-text {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 10.5px; font-weight: 500;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 3px;
-    }
-    .module-meta-text {
-      font-family: 'DM Mono', monospace;
-      font-size: 8.5px; color: var(--muted);
-      opacity: 0.38; letter-spacing: 0.06em;
-    }
-
-    /* Tiny ring progress */
-    .module-ring { flex-shrink: 0; }
-    .module-ring svg { display: block; }
-    .ring-bg { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 1.6; }
-    .ring-fill {
-      fill: none; stroke: var(--teal); stroke-width: 1.6;
-      stroke-linecap: round;
-      transform-origin: center; transform: rotate(-90deg);
-      transition: stroke-dashoffset .6s ease, stroke .4s;
-    }
-
-    .module-chevron {
-      width: 12px; height: 12px; flex-shrink: 0;
-      color: var(--muted); opacity: 0.35;
-      transition: transform .3s ease, opacity .25s;
-    }
-    .module-hdr:hover .module-chevron { opacity: 0.65; }
-    .module.is-closed .module-chevron { transform: rotate(-90deg); }
-
-    /* Video list */
-    .module-videos {
+    /* ── Player ──────────────────────────────────────────────── */
+    .player-wrap {
+      background: #070B16;
+      border-radius: 0 0 12px 12px;
       overflow: hidden;
-      max-height: 2400px;
-      transition: max-height .38s ease;
+      box-shadow: 0 8px 32px rgba(8,13,26,0.18);
     }
-    .module.is-closed .module-videos { max-height: 0; }
-
-    /* Video item */
-    .vi {
-      display: flex; align-items: flex-start; gap: 12px;
-      padding: 12px 24px 12px 20px;
-      border-left: 2px solid transparent;
-      cursor: pointer;
-      transition: background .18s, border-color .18s;
-      position: relative;
-    }
-    .vi:hover:not(.vi--locked) {
-      background: rgba(255,255,255,0.025);
-      border-left-color: rgba(255,255,255,0.09);
-    }
-    .vi.vi--active {
-      background: rgba(29,158,117,0.07);
-      border-left-color: var(--teal);
-    }
-    .vi.vi--locked { cursor: not-allowed; opacity: 0.38; }
-    .vi.vi--locked:hover { background: none; border-left-color: transparent; }
-    .vi.vi--done .vi-icon { color: var(--teal) !important; opacity: 1 !important; }
-
-    /* Icon column */
-    .vi-icon {
-      flex-shrink: 0;
-      width: 16px; height: 16px; margin-top: 1px;
-      color: var(--muted); opacity: 0.45;
-      transition: color .25s, opacity .25s;
-    }
-    .vi:not(.vi--locked):hover .vi-icon { opacity: 0.85; }
-    .vi.vi--active .vi-icon { color: var(--teal) !important; opacity: 1 !important; }
-
-    /* Content column */
-    .vi-body { flex: 1; min-width: 0; }
-    .vi-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 7.5px; letter-spacing: 0.1em;
-      color: var(--muted); opacity: 0.35; margin-bottom: 2px;
-    }
-    .vi-title {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12.5px; font-weight: 400; line-height: 1.45;
-      color: var(--text); opacity: 0.82;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      margin-bottom: 3px;
-    }
-    .vi.vi--locked .vi-title { opacity: 0.4; }
-    .vi.vi--active .vi-title { opacity: 1; }
-    .vi-dur {
-      font-family: 'DM Mono', monospace;
-      font-size: 8.5px; color: var(--muted); opacity: 0.38; letter-spacing: 0.06em;
-    }
-    .vi-bar {
-      height: 2px; background: rgba(255,255,255,0.05);
-      border-radius: 1px; overflow: hidden; margin-top: 5px;
-    }
-    .vi-bar-fill {
-      height: 100%; background: var(--teal); border-radius: 1px;
-      transition: width .5s ease;
-    }
-    .vi-lock-hint {
-      font-family: 'DM Mono', monospace;
-      font-size: 7.5px; color: var(--gold);
-      letter-spacing: 0.08em; opacity: 0.65; margin-top: 4px;
-    }
-
-    /* ─── Main area ──────────────────────────────────────────── */
-    .main {
-      flex: 1; min-width: 0;
-      height: calc(100vh - var(--header-h));
-      overflow-y: auto; overflow-x: hidden;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(255,255,255,0.06) transparent;
-    }
-    .main::-webkit-scrollbar { width: 4px; }
-    .main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 2px; }
-
-    /* ─── Player ─────────────────────────────────────────────── */
-    .player-section { background: #000; position: relative; }
-
     .player-ratio {
-      width: 100%; aspect-ratio: 16/9;
-      position: relative; background: #070B16; overflow: hidden;
-    }
-
-    .player-ratio iframe {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%; border: none;
-      display: none;
-    }
-
-    /* Welcome */
-    .player-welcome {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 14px;
+      width: 100%; padding-top: 56.25%; position: relative;
       background: #070B16;
     }
-    .player-welcome-ring {
-      width: 56px; height: 56px; border-radius: 50%;
+    .player-ratio > * {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+    }
+    .player-ratio iframe { border: none; }
+
+    .player-welcome {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 14px;
+    }
+    .pw-ring {
+      width: 60px; height: 60px; border-radius: 50%;
       border: 1px solid rgba(255,255,255,0.08);
       display: flex; align-items: center; justify-content: center;
     }
-    .player-welcome-text {
-      font-family: 'Playfair Display', serif;
-      font-style: italic; font-size: 16px;
-      color: rgba(255,255,255,0.2); font-weight: 400;
+    .pw-text {
+      font-family: 'Playfair Display', serif; font-style: italic;
+      font-size: 16px; color: rgba(255,255,255,0.22);
     }
 
-    /* Locked overlay */
     .player-locked {
-      position: absolute; inset: 0;
-      background: rgba(8,13,26,0.92);
-      backdrop-filter: blur(10px);
-      display: none; flex-direction: column;
+      display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 10px;
+      background: rgba(8,13,26,0.9); backdrop-filter: blur(12px);
     }
-    .player-locked-icon { font-size: 28px; opacity: 0.45; }
-    .player-locked-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 17px; font-weight: 500; color: var(--text); opacity: 0.55;
+    .pl-icon { font-size: 28px; opacity: 0.5; }
+    .pl-title {
+      font-family: 'Playfair Display', serif; font-size: 18px;
+      font-weight: 500; color: white; opacity: 0.6;
     }
-    .player-locked-sub {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px; font-weight: 300;
-      color: var(--muted); opacity: 0.5; text-align: center; max-width: 280px;
-    }
-
-    /* ─── Video meta ─────────────────────────────────────────── */
-    .vmeta {
-      padding: 24px 28px 20px;
-      border-bottom: 1px solid var(--border);
-    }
-    .vmeta-module {
-      font-family: 'DM Mono', monospace;
-      font-size: 8.5px; letter-spacing: 0.16em;
-      text-transform: uppercase; color: var(--muted); opacity: 0.5;
-      margin-bottom: 8px;
-    }
-    .vmeta-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(18px,2vw,26px);
-      font-weight: 500; line-height: 1.28;
-      color: var(--text); letter-spacing: -0.01em; margin-bottom: 8px;
-    }
-    .vmeta-instructor {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px; font-weight: 300;
-      color: var(--muted); opacity: 0.6; margin-bottom: 16px;
-    }
-    .vmeta-progress-row { display: flex; align-items: center; gap: 12px; }
-    .vmeta-bar {
-      width: 220px; height: 2px;
-      background: rgba(255,255,255,0.07); border-radius: 1px; overflow: hidden;
-    }
-    .vmeta-bar-fill {
-      height: 100%; background: var(--teal);
-      border-radius: 1px; transition: width .5s ease; width: 0%;
-    }
-    .vmeta-pct {
-      font-family: 'DM Mono', monospace;
-      font-size: 9px; color: var(--muted); opacity: 0.55; letter-spacing: 0.08em;
+    .pl-sub {
+      font-family: 'DM Sans', sans-serif; font-size: 13px;
+      color: rgba(255,255,255,0.38); text-align: center; max-width: 280px; line-height: 1.6;
     }
 
-    /* ─── Next video bar ─────────────────────────────────────── */
-    .next-bar {
-      display: none;
-      align-items: center; justify-content: space-between;
-      gap: 16px; padding: 16px 28px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(29,158,117,0.04);
+    .player-coming-soon {
+      display: flex; align-items: center; justify-content: center;
+      background: var(--navy);
     }
-    .next-bar.is-visible { display: flex; }
-    .next-bar-left { flex: 1; min-width: 0; }
-    .next-bar-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 8px; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--teal); opacity: 0.6; margin-bottom: 3px;
+    .player-coming-soon p {
+      font-family: 'DM Sans', sans-serif; font-size: 18px;
+      color: var(--g500); text-align: center; max-width: 340px; line-height: 1.6;
+      padding: 0 24px;
     }
-    .next-bar-title {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12.5px; color: var(--text); opacity: 0.75;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+
+    /* ── Content area (padded) ───────────────────────────────── */
+    .col-inner { padding: 24px 32px 80px; }
+
+    /* ── Author + next ───────────────────────────────────────── */
+    .author-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px; gap: 12px;
     }
-    .next-btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 9px 20px; border-radius: 99px;
-      border: 1px solid rgba(29,158,117,0.32);
-      background: rgba(29,158,117,0.08);
-      color: var(--teal);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 11.5px; font-weight: 500; letter-spacing: 0.04em;
+    .author-l { display: flex; align-items: center; gap: 12px; }
+    .author-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      object-fit: cover; background: var(--g200); flex-shrink: 0;
+      border: 2px solid var(--g200);
+    }
+    .author-text { font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--g600); }
+    .author-text strong { color: var(--navy); font-weight: 600; }
+
+    .btn-next {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; border: 1px solid var(--gold);
+      color: var(--gold); font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 8px 20px; border-radius: 6px;
       cursor: pointer; white-space: nowrap; flex-shrink: 0;
-      transition: background .25s, border-color .25s;
+      transition: background .2s, color .2s;
     }
-    .next-btn:hover {
-      background: rgba(29,158,117,0.15);
-      border-color: rgba(29,158,117,0.52);
+    .btn-next:hover { background: var(--gold); color: var(--navy); }
+
+    /* ── Lesson info ─────────────────────────────────────────── */
+    .lesson-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(22px, 2.4vw, 32px);
+      font-weight: 700; line-height: 1.2; color: var(--navy);
+      margin-bottom: 12px;
+    }
+    .lesson-desc {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px; line-height: 1.75; color: var(--g600);
     }
 
-    /* ─── Course complete banner ─────────────────────────────── */
+    /* ── Complete banner ─────────────────────────────────────── */
     .complete-banner {
-      display: none;
-      flex-direction: column; align-items: center;
-      padding: 40px 28px; text-align: center; gap: 10px;
+      display: none; flex-direction: column; align-items: center;
+      text-align: center; padding: 48px 32px; gap: 10px;
+      margin-top: 32px;
     }
     .complete-banner.is-visible { display: flex; }
-    .complete-banner-icon { font-size: 32px; margin-bottom: 4px; }
-    .complete-banner-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px; font-weight: 500; color: var(--text); font-style: italic;
+    .cb-icon { font-size: 32px; margin-bottom: 4px; }
+    .cb-title { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; font-weight: 500; color: var(--navy); }
+    .cb-sub { font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--g500); }
+
+    /* ── Right sidebar ───────────────────────────────────────── */
+    .col-sidebar {
+      background: white; border-left: 1px solid var(--g200);
+      height: calc(100vh - var(--hdr)); position: sticky; top: var(--hdr);
+      overflow-y: auto; overflow-x: hidden;
+      scrollbar-width: thin; scrollbar-color: var(--g200) transparent;
+      padding: 20px;
     }
-    .complete-banner-sub {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px; font-weight: 300; color: var(--muted); opacity: 0.65;
+    .col-sidebar::-webkit-scrollbar { width: 4px; }
+    .col-sidebar::-webkit-scrollbar-thumb { background: var(--g200); border-radius: 2px; }
+
+    /* ── Overall progress ────────────────────────────────────── */
+    .prog-row {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 20px; padding-bottom: 20px;
+      border-bottom: 1px solid var(--g200);
+    }
+    .prog-text {
+      flex: 1; font-family: 'DM Sans', sans-serif;
+      font-size: 14px; color: var(--g600); line-height: 1.4;
     }
 
-    /* ─── Mobile sidebar backdrop ────────────────────────────── */
+    /* ── Module cards ────────────────────────────────────────── */
+    .mod-card {
+      background: white; border: 1px solid var(--g200);
+      border-radius: 12px; overflow: hidden; margin-bottom: 12px;
+    }
+    .mod-card-hdr {
+      padding: 16px 20px; background: var(--g50);
+      border-bottom: 1px solid var(--g200);
+    }
+    .mod-card-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .mod-name {
+      font-family: 'Playfair Display', serif; font-size: 15px;
+      color: var(--navy); font-weight: 500; line-height: 1.3; flex: 1;
+    }
+    .mod-dur {
+      font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--g500);
+      flex-shrink: 0; padding-left: 8px;
+    }
+    .mod-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .mod-tag {
+      font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 4px;
+    }
+
+    /* ── Lesson rows ─────────────────────────────────────────── */
+    .lr {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 20px; border-top: 1px solid var(--g100);
+      cursor: pointer; min-height: 64px;
+      transition: background .15s;
+    }
+    .lr:hover:not(.lr--locked) { background: var(--g50); }
+    .lr.lr--active { background: #EEF2FF; }
+    .lr.lr--locked { opacity: 0.5; cursor: not-allowed; }
+    .lr.lr--coming-soon { opacity: 0.5; cursor: pointer; }
+    .lr.lr--coming-soon:hover { background: var(--g50); opacity: 0.65; }
+
+    .lr-icon { flex-shrink: 0; }
+    .lr-info { flex: 1; min-width: 0; }
+    .lr-title {
+      display: block; font-family: 'DM Sans', sans-serif;
+      font-size: 14px; color: var(--navy); font-weight: 400;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .lr--active .lr-title { font-weight: 600; }
+    .lr--locked .lr-title,
+    .lr--coming-soon .lr-title { color: var(--g400); }
+    .lr-dur {
+      display: block; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; color: var(--g500); margin-top: 1px;
+    }
+
+    /* ── Mobile ──────────────────────────────────────────────── */
     .sidebar-backdrop {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.72); z-index: 490;
-      opacity: 0; transition: opacity .3s;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55); z-index: 490;
     }
-    .sidebar-backdrop.is-visible {
-      display: block; opacity: 1;
-    }
+    .sidebar-backdrop.is-visible { display: block; }
 
-    /* ─── Responsive ─────────────────────────────────────────── */
     @media (max-width: 1023px) {
-      :root { --sidebar-w: 320px; }
+      .layout { grid-template-columns: 60fr 40fr; }
     }
 
     @media (max-width: 767px) {
-      :root { --sidebar-w: 100%; }
+      .layout { grid-template-columns: 1fr; }
+      .col-inner { padding: 20px 16px 60px; }
 
-      .hdr { padding: 0 16px; }
-      .hdr-sep, .hdr-course { display: none; }
-      .hdr-progress-track { width: 70px; }
       .hdr-menu-btn { display: flex; }
+      .hdr-track { width: 70px; }
+      .hdr-sep, .hdr-label { display: none; }
 
-      .sidebar {
-        position: fixed;
-        top: var(--header-h); left: 0;
-        width: min(360px, 90vw);
-        height: calc(100vh - var(--header-h));
-        z-index: 500;
-        transform: translateX(-100%);
+      .player-wrap { border-radius: 0; box-shadow: none; }
+
+      .col-sidebar {
+        position: fixed; top: var(--hdr); right: 0;
+        width: min(360px, 92vw); height: calc(100vh - var(--hdr));
+        transform: translateX(100%); z-index: 500; border-left: none;
+        box-shadow: none;
+        transition: transform .32s cubic-bezier(.4,0,.2,1);
       }
-      .sidebar.is-open { transform: translateX(0); }
+      .col-sidebar.is-open {
+        transform: translateX(0);
+        box-shadow: -4px 0 24px rgba(0,0,0,0.14);
+      }
 
-      .main { height: calc(100vh - var(--header-h)); }
-
-      .vmeta { padding: 18px 16px 16px; }
-      .next-bar { padding: 14px 16px; }
+      .lesson-title { font-size: 22px; }
+      .lesson-desc  { font-size: 15px; }
     }
   </style>
 </head>
 <body>
 
-<!-- Mobile sidebar backdrop -->
 <div class="sidebar-backdrop" id="backdrop"></div>
 
-<!-- ─ Header ──────────────────────────────────────────────────────── -->
 <header class="hdr">
   <div class="hdr-left">
-    <button class="hdr-menu-btn" id="menuBtn" aria-label="Toggle curriculum">
-      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-        <line x1="1" y1="3.5" x2="14" y2="3.5"/>
-        <line x1="1" y1="7.5" x2="14" y2="7.5"/>
-        <line x1="1" y1="11.5" x2="14" y2="11.5"/>
+    <button class="hdr-menu-btn" id="menuBtn" aria-label="Open course content">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <line x1="1" y1="4" x2="15" y2="4"/>
+        <line x1="1" y1="8" x2="15" y2="8"/>
+        <line x1="1" y1="12" x2="15" y2="12"/>
       </svg>
     </button>
     <a href="../" class="hdr-brand">
-      <img src="../brand-assets/logo.png" alt="PianoPro"
-           onerror="this.style.display='none'">
+      <img src="../brand-assets/logo.png" alt="PianoPro" onerror="this.style.display='none'">
       <span class="hdr-brand-name">PianoPro</span>
     </a>
     <div class="hdr-sep"></div>
-    <span class="hdr-course">PianoMind</span>
+    <span class="hdr-label">PianoMind</span>
   </div>
-  <div class="hdr-progress">
-    <span class="hdr-progress-label">Progress</span>
-    <div class="hdr-progress-track">
-      <div class="hdr-progress-fill" id="hdrFill"></div>
+  <div class="hdr-right">
+    <div class="hdr-progress">
+      <span class="hdr-progress-label">Progress</span>
+      <div class="hdr-track"><div class="hdr-fill" id="hdrFill"></div></div>
+      <span class="hdr-pct" id="hdrPct">0%</span>
     </div>
-    <span class="hdr-progress-pct" id="hdrPct">0%</span>
   </div>
 </header>
 
-<!-- ─ Layout ──────────────────────────────────────────────────────── -->
 <div class="layout">
 
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar"></aside>
+  <!-- ── LEFT COLUMN ─────────────────────────────────────────── -->
+  <div class="col-main" id="mainArea">
 
-  <!-- Main -->
-  <main class="main" id="mainArea">
-
-    <!-- Player -->
-    <div class="player-section">
+    <div class="player-wrap">
       <div class="player-ratio" id="playerRatio">
-
-        <!-- Welcome state -->
         <div class="player-welcome" id="playerWelcome">
-          <div class="player-welcome-ring">
+          <div class="pw-ring">
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
               <circle cx="11" cy="11" r="9" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
               <polygon points="9,7 17,11 9,15" fill="rgba(255,255,255,0.22)"/>
             </svg>
           </div>
-          <p class="player-welcome-text">Select a lesson to begin</p>
+          <p class="pw-text">Select a lesson to begin</p>
         </div>
-
-        <!-- Video iframe -->
-        <iframe id="player" src="" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowfullscreen></iframe>
-
-        <!-- Locked overlay -->
-        <div class="player-locked" id="playerLocked">
-          <div class="player-locked-icon">🔒</div>
-          <p class="player-locked-title">Lesson locked</p>
-          <p class="player-locked-sub" id="lockedMsg">Complete the previous lesson to unlock this one.</p>
-        </div>
-
       </div>
     </div>
 
-    <!-- Video metadata -->
-    <div class="vmeta" id="vmeta" style="display:none"></div>
+    <div class="col-inner">
 
-    <!-- Next video bar -->
-    <div class="next-bar" id="nextBar">
-      <div class="next-bar-left">
-        <div class="next-bar-label">Up next</div>
-        <div class="next-bar-title" id="nextTitle"></div>
+      <!-- Author + next lesson -->
+      <div class="author-row">
+        <div class="author-l">
+          <img class="author-avatar" id="authorAvatar" src="" alt="" onerror="this.style.background='var(--g200)'">
+          <span class="author-text">Instructor: <strong id="authorName">—</strong></span>
+        </div>
+        <button class="btn-next" id="nextBtn" style="display:none" aria-label="Go to next lesson">
+          Next Lesson
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="2" y1="6" x2="10" y2="6"/>
+            <polyline points="7,3 10,6 7,9"/>
+          </svg>
+        </button>
       </div>
-      <button class="next-btn" id="nextBtn">Continue →</button>
+
+      <!-- Lesson title -->
+      <h1 class="lesson-title" id="lessonTitle">Select a lesson to begin</h1>
+
+      <!-- Lesson description -->
+      <p class="lesson-desc" id="lessonDesc">Choose a lesson from the curriculum on the right to start watching.</p>
+
+      <!-- Complete banner -->
+      <div class="complete-banner" id="completeBanner">
+        <div class="cb-icon">🎹</div>
+        <p class="cb-title">Course complete.</p>
+        <p class="cb-sub">You've completed all lessons in PianoMind.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── RIGHT SIDEBAR ──────────────────────────────────────── -->
+  <aside class="col-sidebar" id="sidebar">
+
+    <div class="prog-row">
+      <div class="prog-text" id="progressText">0 of 18 lessons completed</div>
+      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true" style="flex-shrink:0">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="#E5E7EB" stroke-width="4"/>
+        <circle cx="22" cy="22" r="18" fill="none" stroke="#E5E7EB" stroke-width="4"
+          stroke-dasharray="0 113.1" stroke-linecap="round"
+          transform="rotate(-90 22 22)" id="overallRingFill"/>
+      </svg>
     </div>
 
-    <!-- Course complete banner -->
-    <div class="complete-banner" id="completeBanner">
-      <div class="complete-banner-icon">🎹</div>
-      <p class="complete-banner-title">Course complete.</p>
-      <p class="complete-banner-sub">You've completed all lessons in PianoMind.</p>
-    </div>
+    <div id="moduleList"></div>
 
-  </main>
+  </aside>
+
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════════
-   CONFIGURATION — replace BUNNY_LIB and each bunnyId before launch
-═══════════════════════════════════════════════════════════════════ */
-const BUNNY_LIB       = 'YOUR_LIBRARY_ID';    // ← replace with Bunny Stream library ID
+/* ═══════════════════════════════════════════════════════════════
+   CONFIGURATION
+═══════════════════════════════════════════════════════════════ */
+const VIDEO_PROVIDER  = 'vimeo'; // 'vimeo' | 'bunny'
 const STORAGE_KEY     = 'pm_progress_v1';
 const LAST_KEY        = 'pm_last_v1';
-const UNLOCK_PCT      = 80;                   // percent watched to unlock next lesson
-const SAVE_INTERVAL   = 10_000;               // ms between localStorage saves
+const UNLOCK_PCT      = 80;
+const SAVE_INTERVAL   = 10_000;
 
-const COURSE = [
+/* ═══════════════════════════════════════════════════════════════
+   COURSE DATA
+═══════════════════════════════════════════════════════════════ */
+const modules = [
   {
-    id: 'm1', num: '01', title: 'Performance Psychology',
-    instructor: "Heather O'Donnell",
-    videos: [
-      { id:'v1_1', bId:'PLACEHOLDER_1_1', title:'Cultivating the Zone',         dur:720,  durStr:'12:00' },
-      { id:'v1_2', bId:'PLACEHOLDER_1_2', title:'ACT and Flexibility',          dur:900,  durStr:'15:00' },
-      { id:'v1_3', bId:'PLACEHOLDER_1_3', title:'Self-talk Strategies',         dur:600,  durStr:'10:00' },
-      { id:'v1_4', bId:'PLACEHOLDER_1_4', title:'Imagery and Exposure',         dur:1080, durStr:'18:00' },
-      { id:'v1_5', bId:'PLACEHOLDER_1_5', title:'Career Alignment',             dur:840,  durStr:'14:00' },
+    id: 1,
+    title: 'Piano Practice and Productivity Principles',
+    description: 'Evidence-based strategies for structuring practice sessions, setting measurable goals, and building sustainable habits. Grounded in cognitive science research on skill acquisition and deliberate practice.',
+    tag1: { label: 'FOUNDATIONS', bg: '#1D9E75', color: '#FFFFFF' },
+    tag2: { label: 'MODULE 1',    bg: '#D4A574', color: '#080D1A' },
+    lessons: [
+      { id: '1.1', vimeoId: '1190747389', title: 'Intro',                    instructor: 'Michelangelo Salamone', duration: null },
+      { id: '1.2', vimeoId: '1190747443', title: 'Macrogoals and Micro Goals', instructor: 'Michelangelo Salamone', duration: null },
+      { id: '1.3', vimeoId: '1190747481', title: 'Do It Well and Do It Now',  instructor: 'Michelangelo Salamone', duration: null },
+      { id: '1.4', vimeoId: '1190747511', title: 'Deadlines',                 instructor: 'Michelangelo Salamone', duration: null },
+      { id: '1.5', vimeoId: '1190747591', title: 'Productivity Habits',       instructor: 'Michelangelo Salamone', duration: null },
+      { id: '1.6', vimeoId: '1190747621', title: 'Habits',                    instructor: 'Michelangelo Salamone', duration: null }
     ]
   },
   {
-    id: 'm2', num: '02', title: 'Neuroscience',
-    instructor: 'Michelangelo Salamone',
-    videos: [
-      { id:'v2_1', bId:'PLACEHOLDER_2_1', title:'State-dependent Learning',     dur:960,  durStr:'16:00' },
-      { id:'v2_2', bId:'PLACEHOLDER_2_2', title:'Memory Encoding',              dur:1200, durStr:'20:00' },
-      { id:'v2_3', bId:'PLACEHOLDER_2_3', title:'Autonomic Control',            dur:720,  durStr:'12:00' },
+    id: 2,
+    title: 'Reading',
+    description: 'Systematic approaches to sight-reading and score analysis, developing fluency and structural comprehension across styles and periods.',
+    tag1: { label: 'SKILLS',   bg: '#1B3A6B', color: '#FFFFFF' },
+    tag2: { label: 'MODULE 2', bg: '#D4A574', color: '#080D1A' },
+    lessons: [
+      { id: '2.1', vimeoId: 'PLACEHOLDER', title: 'Lesson 2.1', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
+      { id: '2.2', vimeoId: 'PLACEHOLDER', title: 'Lesson 2.2', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
+      { id: '2.3', vimeoId: 'PLACEHOLDER', title: 'Lesson 2.3', instructor: 'Michelangelo Salamone', duration: null }  // PLACEHOLDER
     ]
   },
   {
-    id: 'm3', num: '03', title: 'Biomechanics',
-    instructor: 'Michelangelo Salamone',
-    videos: [
-      { id:'v3_1', bId:'PLACEHOLDER_3_1', title:'Force Distribution',           dur:1080, durStr:'18:00' },
-      { id:'v3_2', bId:'PLACEHOLDER_3_2', title:'Injury Prevention',            dur:900,  durStr:'15:00' },
-      { id:'v3_3', bId:'PLACEHOLDER_3_3', title:'Movement Economy',             dur:840,  durStr:'14:00' },
+    id: 3,
+    title: 'Problem Solving and Repertoire Optimization',
+    description: 'Diagnostic frameworks for identifying technical obstacles and selecting practice strategies matched to the specific demands of the repertoire.',
+    tag1: { label: 'APPLIED',  bg: '#1D9E75', color: '#FFFFFF' },
+    tag2: { label: 'MODULE 3', bg: '#D4A574', color: '#080D1A' },
+    lessons: [
+      { id: '3.1', vimeoId: 'PLACEHOLDER', title: 'Lesson 3.1', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
+      { id: '3.2', vimeoId: 'PLACEHOLDER', title: 'Lesson 3.2', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
+      { id: '3.3', vimeoId: 'PLACEHOLDER', title: 'Lesson 3.3', instructor: 'Michelangelo Salamone', duration: null }  // PLACEHOLDER
     ]
   },
   {
-    id: 'm4', num: '04', title: 'Methodology',
-    instructor: 'Michelangelo Salamone',
-    videos: [
-      { id:'v4_1', bId:'PLACEHOLDER_4_1', title:'Passage Protocol',             dur:1320, durStr:'22:00' },
-      { id:'v4_2', bId:'PLACEHOLDER_4_2', title:'Context-Independent Practice', dur:960,  durStr:'16:00' },
-      { id:'v4_3', bId:'PLACEHOLDER_4_3', title:'Performance Simulation',       dur:720,  durStr:'12:00' },
+    id: 4,
+    title: 'Memorization and Performance Preparation',
+    description: 'Memory encoding strategies grounded in neuroscience, combined with structured performance preparation protocols to reduce performance anxiety and increase reliability.',
+    tag1: { label: 'ADVANCED', bg: '#080D1A', color: '#FFFFFF' },
+    tag2: { label: 'MODULE 4', bg: '#D4A574', color: '#080D1A' },
+    lessons: [
+      { id: '4.1', vimeoId: 'PLACEHOLDER', title: 'Lesson 4.1', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
+      { id: '4.2', vimeoId: 'PLACEHOLDER', title: 'Lesson 4.2', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
+      { id: '4.3', vimeoId: 'PLACEHOLDER', title: 'Lesson 4.3', instructor: 'Michelangelo Salamone', duration: null }  // PLACEHOLDER
+    ]
+  },
+  {
+    id: 5,
+    title: 'Psychological Preparation',
+    description: 'Applied sport psychology methods adapted for the concert stage, covering pre-performance routines, stress regulation, and recovery from errors during live performance.',
+    tag1: { label: 'PSYCHOLOGY', bg: '#1B3A6B', color: '#FFFFFF' },
+    tag2: { label: 'MODULE 5',   bg: '#D4A574', color: '#080D1A' },
+    lessons: [
+      { id: '5.1', vimeoId: 'PLACEHOLDER', title: 'Lesson 5.1', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
+      { id: '5.2', vimeoId: 'PLACEHOLDER', title: 'Lesson 5.2', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
+      { id: '5.3', vimeoId: 'PLACEHOLDER', title: 'Lesson 5.3', instructor: 'Michelangelo Salamone', duration: null }  // PLACEHOLDER
     ]
   }
 ];
 
-/* ── Flatten videos with back-reference ──────────────────────── */
-const VIDEOS = [];
-COURSE.forEach(m => m.videos.forEach(v => { v._m = m; VIDEOS.push(v); }));
+/* Flat ordered list — derived once */
+const ALL_LESSONS_DATA = modules.flatMap(m => m.lessons.map(l => ({ ...l, _mod: m })));
+const ALL_LESSONS      = ALL_LESSONS_DATA.map(l => l.id); // 18 total
 
-/* ═══════════════════════════════════════════════════════════════════
+function getLessonData(id) {
+  return ALL_LESSONS_DATA.find(l => l.id === id);
+}
+function isPlaceholder(id) {
+  const l = getLessonData(id);
+  return l ? l.vimeoId === 'PLACEHOLDER' : false;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    STATE
-═══════════════════════════════════════════════════════════════════ */
-let prog    = {};    // { [id]: { currentTime, duration, pct } }
-let active  = null;  // currently loaded videoId (may be locked)
-let playing = null;  // actually playing videoId
+═══════════════════════════════════════════════════════════════ */
+let prog      = {};
+let activeId  = null;
+let playingId = null;
 
-/* ── Persistence ─────────────────────────────────────────────── */
+/* ── Persistence ─────────────────────────────────────────── */
 function loadProg() {
   try { prog = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { prog = {}; }
 }
@@ -645,411 +523,364 @@ function saveProg() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(prog)); } catch {}
 }
 function getProg(id) {
-  return prog[id] || { currentTime: 0, duration: 0, pct: 0 };
+  return prog[id] || { currentTime: 0, duration: 0, percentWatched: 0 };
 }
 
-/* ── Unlock logic ────────────────────────────────────────────── */
+/* ── Unlock logic ─────────────────────────────────────────── */
 function isUnlocked(id) {
-  const idx = VIDEOS.findIndex(v => v.id === id);
+  if (isPlaceholder(id)) return false;
+  const idx = ALL_LESSONS.indexOf(id);
   if (idx <= 0) return true;
-  return getProg(VIDEOS[idx - 1].id).pct >= UNLOCK_PCT;
+  return getProg(ALL_LESSONS[idx - 1]).percentWatched >= UNLOCK_PCT;
 }
-function prevVideo(id) {
-  const idx = VIDEOS.findIndex(v => v.id === id);
-  return idx > 0 ? VIDEOS[idx - 1] : null;
+function nextLesson(id) {
+  const idx = ALL_LESSONS.indexOf(id);
+  return (idx >= 0 && idx < ALL_LESSONS.length - 1) ? ALL_LESSONS[idx + 1] : null;
 }
-function nextVideo(id) {
-  const idx = VIDEOS.findIndex(v => v.id === id);
-  return idx >= 0 && idx < VIDEOS.length - 1 ? VIDEOS[idx + 1] : null;
+function prevLesson(id) {
+  const idx = ALL_LESSONS.indexOf(id);
+  return idx > 0 ? ALL_LESSONS[idx - 1] : null;
 }
-
-/* ── Overall progress ────────────────────────────────────────── */
+function completedCount() {
+  return ALL_LESSONS.filter(id => !isPlaceholder(id) && getProg(id).percentWatched >= UNLOCK_PCT).length;
+}
+function totalReal() {
+  return ALL_LESSONS.filter(id => !isPlaceholder(id)).length;
+}
 function overallPct() {
-  const done = VIDEOS.filter(v => getProg(v.id).pct >= UNLOCK_PCT).length;
-  return Math.round((done / VIDEOS.length) * 100);
+  const real = totalReal();
+  return real > 0 ? Math.round((completedCount() / real) * 100) : 0;
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   SIDEBAR RENDERING
-═══════════════════════════════════════════════════════════════════ */
-function renderSidebar() {
-  const sb = document.getElementById('sidebar');
+/* ═══════════════════════════════════════════════════════════════
+   PLAYER
+═══════════════════════════════════════════════════════════════ */
+function renderPlayer(id) {
+  const lesson = getLessonData(id);
+  if (!lesson || isPlaceholder(id)) return '';
 
-  /* summary strip */
-  const totalSecs = VIDEOS.reduce((s, v) => s + v.dur, 0);
-  const h = Math.floor(totalSecs / 3600);
-  const m = Math.floor((totalSecs % 3600) / 60);
-  const doneCount = VIDEOS.filter(v => getProg(v.id).pct >= UNLOCK_PCT).length;
-
-  const summary = document.createElement('div');
-  summary.className = 'sidebar-summary';
-  summary.innerHTML = `
-    <div class="sidebar-summary-label">PianoMind</div>
-    <div class="sidebar-summary-stats">
-      <div class="sidebar-stat">
-        <span class="sidebar-stat-val">${VIDEOS.length}</span>
-        <span class="sidebar-stat-key">lessons</span>
-      </div>
-      <div class="sidebar-stat-sep"></div>
-      <div class="sidebar-stat">
-        <span class="sidebar-stat-val">${h}h ${m}m</span>
-        <span class="sidebar-stat-key">total</span>
-      </div>
-      <div class="sidebar-stat-sep"></div>
-      <div class="sidebar-stat" id="sbDoneStat">
-        <span class="sidebar-stat-val">${doneCount}</span>
-        <span class="sidebar-stat-key">completed</span>
-      </div>
-    </div>`;
-  sb.appendChild(summary);
-
-  COURSE.forEach(mod => {
-    const modEl = document.createElement('div');
-    modEl.className = 'module';
-    modEl.id = 'mod-' + mod.id;
-
-    const modSecs  = mod.videos.reduce((s, v) => s + v.dur, 0);
-    const modH     = Math.floor(modSecs / 3600);
-    const modM     = Math.floor((modSecs % 3600) / 60);
-    const modLabel = modH > 0 ? `${modH}h ${modM}m` : `${modM}m`;
-    const modDone  = mod.videos.filter(v => getProg(v.id).pct >= UNLOCK_PCT).length;
-    const ringPct  = Math.round((modDone / mod.videos.length) * 100);
-    const R = 10, C = 2 * Math.PI * R;
-
-    modEl.innerHTML = `
-      <div class="module-hdr" id="modhdr-${mod.id}">
-        <span class="module-num">${mod.num}</span>
-        <div class="module-info">
-          <div class="module-title-text">${mod.title}</div>
-          <div class="module-meta-text">${mod.videos.length} lessons · ${modLabel}</div>
-        </div>
-        <div class="module-ring">
-          <svg width="26" height="26" viewBox="0 0 26 26">
-            <circle class="ring-bg" cx="13" cy="13" r="${R}"/>
-            <circle class="ring-fill" id="ring-${mod.id}" cx="13" cy="13" r="${R}"
-              stroke-dasharray="${C.toFixed(2)}"
-              stroke-dashoffset="${(C - C * ringPct / 100).toFixed(2)}"
-              style="stroke:${ringPct > 0 ? 'var(--teal)' : 'rgba(255,255,255,0.06)'}"/>
-          </svg>
-        </div>
-        <svg class="module-chevron" viewBox="0 0 12 12" fill="none"
-             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="2,4.5 6,7.5 10,4.5"/>
-        </svg>
-      </div>
-      <div class="module-videos" id="mvids-${mod.id}"></div>`;
-
-    sb.appendChild(modEl);
-
-    document.getElementById('modhdr-' + mod.id)
-      .addEventListener('click', () => toggleModule(mod.id));
-
-    const vidsEl = document.getElementById('mvids-' + mod.id);
-    mod.videos.forEach(v => vidsEl.appendChild(makeVideoItem(v)));
-  });
+  if (VIDEO_PROVIDER === 'vimeo') {
+    return `<iframe
+      src="https://player.vimeo.com/video/${lesson.vimeoId}?title=0&byline=0&portrait=0&badge=0&autopause=0&dnt=1&player_id=0&app_id=58479"
+      frameborder="0"
+      allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen
+      style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>`;
+  }
+  return '';
 }
 
-function makeVideoItem(video) {
-  const el = document.createElement('div');
-  el.className = 'vi';
-  el.id = 'vi-' + video.id;
-  el.addEventListener('click', () => handleVideoClick(video.id));
-  syncVideoItem(el, video);
-  return el;
-}
+function loadLesson(id) {
+  const lesson = getLessonData(id);
+  if (!lesson) return;
 
-function syncVideoItem(el, video) {
-  const p        = getProg(video.id);
-  const unlocked = isUnlocked(video.id);
-  const done     = p.pct >= UNLOCK_PCT;
-  const inProg   = p.pct > 0 && !done;
-  const isActive = active === video.id;
+  activeId  = id;
+  playingId = id;
 
-  el.className = 'vi'
-    + (isActive  ? ' vi--active'  : '')
-    + (!unlocked ? ' vi--locked'  : '')
-    + (done      ? ' vi--done'    : '');
+  document.getElementById('playerRatio').innerHTML = renderPlayer(id);
 
-  /* icon */
-  let icon = '';
-  if (!unlocked) {
-    icon = `<svg class="vi-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3.5" y="7" width="9" height="7.5" rx="1.2"/>
-      <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/>
-    </svg>`;
-  } else if (done) {
-    icon = `<svg class="vi-icon" viewBox="0 0 16 16" fill="none" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="8" cy="8" r="6.2"/>
-      <polyline points="5,8.5 7,10.5 11,6.5"/>
-    </svg>`;
-  } else if (isActive) {
-    icon = `<svg class="vi-icon" viewBox="0 0 16 16" fill="var(--teal)">
-      <circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--teal)" stroke-width="1.3"/>
-      <polygon points="6.5,5.5 12,8 6.5,10.5"/>
-    </svg>`;
-  } else {
-    icon = `<svg class="vi-icon" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.3"/>
-      <polygon points="6.5,5.5 12,8 6.5,10.5" fill="currentColor" opacity="0.45"/>
-    </svg>`;
+  if (VIDEO_PROVIDER === 'vimeo') {
+    _initVimeo(id);
   }
 
-  /* lesson label: e.g. "1.1" from "v1_1" */
-  const label = video.id.replace('v','').replace('_','.');
+  _updateLessonInfo(id);
+  renderModuleList();
+  updateOverallProgress();
 
-  /* progress mini-bar (only when in progress or done) */
-  const bar = (unlocked && p.pct > 0)
-    ? `<div class="vi-bar"><div class="vi-bar-fill" style="width:${Math.round(p.pct)}%"></div></div>`
-    : '';
-
-  /* lock hint */
-  const hint = !unlocked
-    ? `<div class="vi-lock-hint">Watch previous lesson to unlock</div>`
-    : '';
-
-  el.innerHTML = `
-    ${icon}
-    <div class="vi-body">
-      <div class="vi-label">${label}</div>
-      <div class="vi-title">${video.title}</div>
-      <div class="vi-dur">${video.durStr}</div>
-      ${bar}
-      ${hint}
-    </div>`;
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   MODULE COLLAPSE
-═══════════════════════════════════════════════════════════════════ */
-function toggleModule(id) {
-  document.getElementById('mod-' + id).classList.toggle('is-closed');
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   VIDEO INTERACTION
-═══════════════════════════════════════════════════════════════════ */
-function handleVideoClick(id) {
-  if (!isUnlocked(id)) {
-    showLocked(id);
-  } else {
-    loadVideo(id);
-  }
+  document.getElementById('mainArea').scrollTo({ top: 0, behavior: 'smooth' });
   closeSidebar();
 }
 
+function _initVimeo(id) {
+  const iframe = document.querySelector('#playerRatio iframe');
+  if (!iframe) return;
+
+  if (window._vimeoPlayer) {
+    try { window._vimeoPlayer.destroy(); } catch {}
+    window._vimeoPlayer = null;
+  }
+
+  window._vimeoPlayer = new Vimeo.Player(iframe);
+  const player = window._vimeoPlayer;
+
+  const startT = Math.floor(getProg(id).currentTime || 0);
+  if (startT > 5) {
+    player.ready().then(() => player.setCurrentTime(startT)).catch(() => {});
+  }
+
+  player.on('timeupdate', data => onTimeUpdate(data.seconds, data.duration));
+  player.on('ended', () => onEnded());
+
+  player.getDuration().then(dur => {
+    const lesson = getLessonData(id);
+    if (lesson) {
+      lesson.duration = dur;
+      renderModuleList();
+    }
+  }).catch(() => {});
+}
+
 function showLocked(id) {
-  active = id;
-  const prev = prevVideo(id);
-  document.getElementById('lockedMsg').textContent =
-    prev ? `Complete "${prev.title}" to unlock this lesson.`
-         : 'Complete the previous lesson to unlock this one.';
-  document.getElementById('player').style.display    = 'none';
-  document.getElementById('playerWelcome').style.display = 'none';
-  document.getElementById('playerLocked').style.display  = 'flex';
-  document.getElementById('vmeta').style.display = 'none';
-  refreshAllItems();
-}
+  activeId  = id;
+  playingId = null;
 
-function loadVideo(id) {
-  const video = VIDEOS.find(v => v.id === id);
-  if (!video) return;
+  const prev = prevLesson(id);
+  const prevLesson_ = prev ? getLessonData(prev) : null;
+  const msg = prevLesson_
+    ? `Complete "${prevLesson_.title}" to unlock this lesson.`
+    : 'Complete the previous lesson to unlock this one.';
 
-  active  = id;
-  playing = id;
-
-  const p       = getProg(id);
-  const startT  = Math.floor(p.currentTime || 0);
-  const params  = `autoplay=true&responsive=true&preload=true${startT > 5 ? '&t=' + startT : ''}`;
-  const src     = `https://iframe.mediadelivery.net/embed/${BUNNY_LIB}/${video.bId}?${params}`;
-
-  const iframe = document.getElementById('player');
-  iframe.src   = src;
-  iframe.style.display = 'block';
-  document.getElementById('playerWelcome').style.display = 'none';
-  document.getElementById('playerLocked').style.display  = 'none';
-
-  renderVMeta(video);
-  refreshAllItems();
-  updateNextBar(id);
-  updateHeaderProgress();
-
-  /* scroll player into view on mobile */
-  document.getElementById('mainArea').scrollTo({ top: 0, behavior: 'smooth' });
-
-  /* ensure sidebar item is visible */
-  const el = document.getElementById('vi-' + id);
-  if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-
-  /* make sure parent module is open */
-  const modEl = document.getElementById('mod-' + video._m.id);
-  if (modEl && modEl.classList.contains('is-closed')) modEl.classList.remove('is-closed');
-}
-
-/* ─── Video metadata panel ───────────────────────────────────── */
-function renderVMeta(video) {
-  const p   = getProg(video.id);
-  const el  = document.getElementById('vmeta');
-  el.style.display = 'block';
-  el.innerHTML = `
-    <div class="vmeta-module">Module ${video._m.num} — ${video._m.title}</div>
-    <h1 class="vmeta-title">${video.title}</h1>
-    <p class="vmeta-instructor">with ${video._m.instructor}</p>
-    <div class="vmeta-progress-row">
-      <div class="vmeta-bar">
-        <div class="vmeta-bar-fill" id="vmetaFill" style="width:${Math.round(p.pct)}%"></div>
-      </div>
-      <span class="vmeta-pct" id="vmetaPct">${Math.round(p.pct)}% watched</span>
+  document.getElementById('playerRatio').innerHTML = `
+    <div class="player-locked">
+      <div class="pl-icon">🔒</div>
+      <p class="pl-title">Lesson locked</p>
+      <p class="pl-sub">${msg}</p>
     </div>`;
+
+  renderModuleList();
+  closeSidebar();
 }
 
-function updateVMetaPct(pct) {
-  const fill = document.getElementById('vmetaFill');
-  const pctEl = document.getElementById('vmetaPct');
-  if (fill)  fill.style.width   = Math.round(pct) + '%';
-  if (pctEl) pctEl.textContent  = Math.round(pct) + '% watched';
+function showComingSoon(id) {
+  activeId  = id;
+  playingId = null;
+
+  document.getElementById('playerRatio').innerHTML = `
+    <div class="player-coming-soon">
+      <p>This lesson is not yet available. Check back soon.</p>
+    </div>`;
+
+  const lesson = getLessonData(id);
+  if (lesson) {
+    document.getElementById('lessonTitle').textContent = lesson.title;
+    document.getElementById('lessonDesc').textContent  = lesson._mod.description || '';
+    document.getElementById('authorName').textContent  = lesson.instructor;
+    const avatar = document.getElementById('authorAvatar');
+    avatar.src = '../brand-assets/Michelangelo.png';
+    avatar.alt = lesson.instructor;
+    document.getElementById('nextBtn').style.display = 'none';
+  }
+
+  renderModuleList();
+  closeSidebar();
 }
 
-/* ─── Next bar ───────────────────────────────────────────────── */
-function updateNextBar(id) {
-  const next     = nextVideo(id);
-  const bar      = document.getElementById('nextBar');
-  const complete = document.getElementById('completeBanner');
+function handleLessonClick(id) {
+  if (isPlaceholder(id)) {
+    showComingSoon(id);
+  } else if (!isUnlocked(id)) {
+    showLocked(id);
+  } else {
+    loadLesson(id);
+  }
+}
 
+/* ═══════════════════════════════════════════════════════════════
+   LEFT COLUMN UPDATES
+═══════════════════════════════════════════════════════════════ */
+function _updateLessonInfo(id) {
+  const lesson = getLessonData(id);
+  if (!lesson) return;
+
+  document.getElementById('lessonTitle').textContent = lesson.title;
+  document.getElementById('lessonDesc').textContent  = lesson._mod.description || '';
+  document.getElementById('authorName').textContent  = lesson.instructor;
+
+  const avatar = document.getElementById('authorAvatar');
+  avatar.src = lesson.instructor === 'Michelangelo Salamone'
+    ? '../brand-assets/Michelangelo.png'
+    : '../brand-assets/Heather.png';
+  avatar.alt = lesson.instructor;
+
+  const next    = nextLesson(id);
+  const nextBtn = document.getElementById('nextBtn');
   if (next) {
-    document.getElementById('nextTitle').textContent = next.title;
-    document.getElementById('nextBtn').onclick = () => handleVideoClick(next.id);
-    bar.classList.add('is-visible');
-    complete.classList.remove('is-visible');
+    nextBtn.style.display = '';
+    nextBtn.onclick = () => handleLessonClick(next);
   } else {
-    bar.classList.remove('is-visible');
-    /* show complete banner only if all videos done */
-    const allDone = VIDEOS.every(v => getProg(v.id).pct >= UNLOCK_PCT);
-    complete.classList.toggle('is-visible', allDone);
+    nextBtn.style.display = 'none';
   }
+
+  const realLessons = ALL_LESSONS.filter(lid => !isPlaceholder(lid));
+  const allDone = realLessons.every(lid => getProg(lid).percentWatched >= UNLOCK_PCT);
+  document.getElementById('completeBanner').classList.toggle('is-visible', !next && allDone);
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   BUNNY STREAM POSTMESSAGE TRACKING
-═══════════════════════════════════════════════════════════════════ */
-window.addEventListener('message', function(e) {
-  /* accept only Bunny's CDN origin */
-  if (!e.origin || !e.origin.includes('mediadelivery.net')) return;
-  const d = e.data;
-  if (!d || !d.event) return;
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR: MODULE LIST
+═══════════════════════════════════════════════════════════════ */
+function renderModuleList() {
+  const container = document.getElementById('moduleList');
+  container.innerHTML = '';
 
-  const evt = d.event.toLowerCase();
+  modules.forEach(mod => {
+    const totalSec = mod.lessons.reduce((s, l) => s + (l.duration || 0), 0);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const durLabel = totalSec > 0 ? (h > 0 ? `${h}h ${m}m` : `${m}m`) : '';
 
-  if (evt === 'timeupdate' || evt === 'timeupdate') {
-    const t   = d.seconds    ?? d.currentTime ?? 0;
-    const dur = d.duration   ?? 0;
-    onTimeUpdate(t, dur);
-  } else if (evt === 'ended') {
-    onEnded();
-  }
-});
+    const lessonsHtml = mod.lessons.map(l => _makeLessonRow(l)).join('');
 
-function onTimeUpdate(t, dur) {
-  if (!playing) return;
-  const pct      = dur > 0 ? (t / dur) * 100 : 0;
-  const existing = getProg(playing);
+    const card = document.createElement('div');
+    card.className = 'mod-card';
+    card.id = 'mod-' + mod.id;
+    card.innerHTML = `
+      <div class="mod-card-hdr">
+        <div class="mod-card-top">
+          <span class="mod-name">${mod.title}</span>
+          ${durLabel ? `<span class="mod-dur">${durLabel}</span>` : ''}
+        </div>
+        <div class="mod-tags">
+          <span class="mod-tag" style="background:${mod.tag1.bg};color:${mod.tag1.color}">${mod.tag1.label}</span>
+          <span class="mod-tag" style="background:${mod.tag2.bg};color:${mod.tag2.color}">${mod.tag2.label}</span>
+        </div>
+      </div>
+      <div class="mod-lessons">${lessonsHtml}</div>`;
 
-  prog[playing] = {
-    currentTime: t,
-    duration:    dur,
-    pct:         Math.max(pct, existing.pct)  /* never go backwards */
-  };
+    /* Attach click to every lesson row — handleLessonClick routes correctly */
+    mod.lessons.forEach(l => {
+      const row = card.querySelector('#lr-' + l.id.replace('.', '_'));
+      if (row) {
+        row.addEventListener('click', () => handleLessonClick(l.id));
+        row.addEventListener('keydown', e => { if (e.key === 'Enter') handleLessonClick(l.id); });
+      }
+    });
 
-  updateVMetaPct(pct);
-  updateSidebarBar(playing, Math.round(pct));
-
-  if (pct >= UNLOCK_PCT) onThresholdReached(playing);
-  updateHeaderProgress();
-}
-
-function onEnded() {
-  if (!playing) return;
-  if (!prog[playing]) prog[playing] = { currentTime: 0, duration: 0, pct: 0 };
-  prog[playing].pct = 100;
-  saveProg();
-  refreshAllItems();
-  refreshModuleRings();
-  updateHeaderProgress();
-  updateNextBar(playing);
-}
-
-function onThresholdReached(id) {
-  refreshItem(id);
-  const nxt = nextVideo(id);
-  if (nxt) refreshItem(nxt.id);
-  refreshModuleRings();
-  updateSidebarSummary();
-  updateNextBar(id);
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   UI REFRESH HELPERS
-═══════════════════════════════════════════════════════════════════ */
-function refreshItem(id) {
-  const el    = document.getElementById('vi-' + id);
-  const video = VIDEOS.find(v => v.id === id);
-  if (el && video) syncVideoItem(el, video);
-}
-function refreshAllItems() {
-  VIDEOS.forEach(v => refreshItem(v.id));
-}
-
-function updateSidebarBar(id, pct) {
-  const fill = document.querySelector('#vi-' + id + ' .vi-bar-fill');
-  if (fill) {
-    fill.style.width = pct + '%';
-  } else {
-    /* bar might not exist yet (video just started) — re-render item */
-    refreshItem(id);
-  }
-}
-
-function refreshModuleRings() {
-  COURSE.forEach(mod => {
-    const done    = mod.videos.filter(v => getProg(v.id).pct >= UNLOCK_PCT).length;
-    const ringPct = Math.round((done / mod.videos.length) * 100);
-    const R       = 10, C = 2 * Math.PI * R;
-    const ring    = document.getElementById('ring-' + mod.id);
-    if (!ring) return;
-    ring.style.strokeDashoffset = (C - C * ringPct / 100).toFixed(2);
-    ring.style.stroke           = ringPct > 0 ? 'var(--teal)' : 'rgba(255,255,255,0.06)';
+    container.appendChild(card);
   });
 }
 
-function updateSidebarSummary() {
-  const el = document.getElementById('sbDoneStat');
-  if (el) {
-    const done = VIDEOS.filter(v => getProg(v.id).pct >= UNLOCK_PCT).length;
-    el.querySelector('.sidebar-stat-val').textContent = done;
+function _makeLessonRow(lesson) {
+  const id       = lesson.id;
+  const p        = getProg(id);
+  const placeholder = isPlaceholder(id);
+  const unlocked = !placeholder && isUnlocked(id);
+  const done     = !placeholder && p.percentWatched >= UNLOCK_PCT;
+  const isActive = activeId === id;
+  const pct      = p.percentWatched || 0;
+
+  const dur    = lesson.duration;
+  const durStr = dur ? `${Math.floor(dur / 60)}:${String(Math.floor(dur % 60)).padStart(2, '0')}` : '--:--';
+
+  let cls = 'lr';
+  if (isActive) cls += ' lr--active';
+  if (placeholder) {
+    cls += ' lr--coming-soon';
+  } else if (!unlocked) {
+    cls += ' lr--locked';
   }
+  if (done) cls += ' lr--done';
+
+  const safeId   = id.replace('.', '_');
+  const tabindex = (unlocked || placeholder) ? '0' : '-1';
+  const role     = (unlocked || placeholder) ? `role="button" aria-label="Play ${lesson.title}"` : 'aria-disabled="true"';
+
+  return `
+    <div class="${cls}" id="lr-${safeId}" tabindex="${tabindex}" ${role}>
+      <div class="lr-icon">${_makeLessonIcon(unlocked, done, isActive, pct, safeId, placeholder)}</div>
+      <div class="lr-info">
+        <span class="lr-title">${lesson.title}</span>
+        <span class="lr-dur">${durStr}</span>
+      </div>
+    </div>`;
 }
 
-function updateHeaderProgress() {
-  const pct = overallPct();
-  document.getElementById('hdrFill').style.width  = pct + '%';
-  document.getElementById('hdrPct').textContent   = pct + '%';
+function _makeLessonIcon(unlocked, done, isActive, pct, safeId, placeholder) {
+  if (!unlocked || placeholder) {
+    return `<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="16" cy="16" r="14" fill="white" stroke="#D1D5DB" stroke-width="2"/>
+      <rect x="11" y="15" width="10" height="8" rx="2" fill="#9CA3AF"/>
+      <path d="M13 15v-3a3 3 0 0 1 6 0v3" stroke="#9CA3AF" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </svg>`;
+  }
+  if (done) {
+    return `<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="16" cy="16" r="16" fill="#1D9E75"/>
+      <polyline points="10,16 14,20.5 22,12" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+  }
+  if (isActive) {
+    const C    = 2 * Math.PI * 14;
+    const dash = ((pct / 100) * C).toFixed(2);
+    return `<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="16" cy="16" r="14" fill="none" stroke="#E5E7EB" stroke-width="2.5"/>
+      <circle cx="16" cy="16" r="14" fill="none" stroke="#D4A574" stroke-width="2.5"
+        stroke-dasharray="${dash} ${C.toFixed(2)}"
+        transform="rotate(-90 16 16)" stroke-linecap="round" id="arc-${safeId}"/>
+      <circle cx="16" cy="16" r="10" fill="white" stroke="#1B3A6B" stroke-width="2"/>
+      <rect x="12.5" y="12" width="2.5" height="8" rx="1" fill="#1B3A6B"/>
+      <rect x="17"   y="12" width="2.5" height="8" rx="1" fill="#1B3A6B"/>
+    </svg>`;
+  }
+  return `<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+    <circle cx="16" cy="16" r="14" fill="white" stroke="#1B3A6B" stroke-width="2"/>
+    <polygon points="13.5,11.5 22.5,16 13.5,20.5" fill="#1B3A6B"/>
+  </svg>`;
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   PERIODIC SAVE — every 10 seconds while something is playing
-═══════════════════════════════════════════════════════════════════ */
-setInterval(() => { if (playing) saveProg(); }, SAVE_INTERVAL);
+/* ═══════════════════════════════════════════════════════════════
+   PROGRESS TRACKING
+═══════════════════════════════════════════════════════════════ */
+function onTimeUpdate(t, dur) {
+  if (!playingId) return;
+  const pct      = dur > 0 ? (t / dur) * 100 : 0;
+  const existing = getProg(playingId);
 
-/* save + store last video on unload */
-window.addEventListener('beforeunload', () => {
+  prog[playingId] = {
+    currentTime:    t,
+    duration:       dur,
+    percentWatched: Math.max(pct, existing.percentWatched)
+  };
+
+  /* Update active-lesson arc in-place */
+  const safeId = playingId.replace('.', '_');
+  const arcEl  = document.getElementById('arc-' + safeId);
+  if (arcEl) {
+    const C = 2 * Math.PI * 14;
+    arcEl.setAttribute('stroke-dasharray', `${((pct / 100) * C).toFixed(2)} ${C.toFixed(2)}`);
+  }
+
+  updateOverallProgress();
+  if (pct >= UNLOCK_PCT) _onThresholdReached(playingId);
+}
+
+function onEnded() {
+  if (!playingId) return;
+  const p = getProg(playingId);
+  prog[playingId] = { ...p, percentWatched: 100 };
   saveProg();
-  if (active) {
-    try { localStorage.setItem(LAST_KEY, active); } catch {}
-  }
-});
+  renderModuleList();
+  updateOverallProgress();
+  if (activeId) _updateLessonInfo(activeId);
+}
 
-/* ═══════════════════════════════════════════════════════════════════
+function _onThresholdReached(id) {
+  renderModuleList();
+  updateOverallProgress();
+}
+
+function updateOverallProgress() {
+  const done = completedCount();
+  const real = totalReal();
+  const pct  = overallPct();
+
+  document.getElementById('progressText').textContent = `${done} of ${real} lessons completed`;
+
+  const C    = 2 * Math.PI * 18;
+  const ring = document.getElementById('overallRingFill');
+  if (ring) {
+    ring.setAttribute('stroke-dasharray', `${((pct / 100) * C).toFixed(2)} ${C.toFixed(2)}`);
+    ring.setAttribute('stroke', pct > 0 ? '#D4A574' : '#E5E7EB');
+  }
+
+  document.getElementById('hdrFill').style.width = pct + '%';
+  document.getElementById('hdrPct').textContent  = pct + '%';
+}
+
+/* ═══════════════════════════════════════════════════════════════
    MOBILE SIDEBAR
-═══════════════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════════ */
 document.getElementById('menuBtn').addEventListener('click', toggleSidebar);
 document.getElementById('backdrop').addEventListener('click', closeSidebar);
 
@@ -1062,32 +893,38 @@ function closeSidebar() {
   document.getElementById('backdrop').classList.remove('is-visible');
 }
 
-/* ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   PERIODIC SAVE + UNLOAD
+═══════════════════════════════════════════════════════════════ */
+setInterval(() => { if (playingId) saveProg(); }, SAVE_INTERVAL);
+
+window.addEventListener('beforeunload', () => {
+  saveProg();
+  if (activeId) {
+    try { localStorage.setItem(LAST_KEY, activeId); } catch {}
+  }
+  if (window._vimeoPlayer) {
+    try { window._vimeoPlayer.destroy(); } catch {}
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
    INIT
-═══════════════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════════ */
 (function init() {
   loadProg();
-  renderSidebar();
-  updateHeaderProgress();
+  renderModuleList();
+  updateOverallProgress();
 
-  /* resume last video (no autoplay — just pre-select) */
   try {
     const last = localStorage.getItem(LAST_KEY);
-    if (last && isUnlocked(last)) {
-      active = last;
-      refreshAllItems();
-      /* show vmeta for context without autoplay */
-      const video = VIDEOS.find(v => v.id === last);
-      if (video) {
-        renderVMeta(video);
-        updateNextBar(last);
-        const el = document.getElementById('vi-' + last);
-        if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      }
+    if (last && getLessonData(last) && !isPlaceholder(last) && isUnlocked(last)) {
+      activeId = last;
+      renderModuleList();
+      _updateLessonInfo(last);
     }
   } catch {}
 })();
 </script>
-
 </body>
 </html>
