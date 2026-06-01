@@ -60,6 +60,11 @@
       --blue-night:   #1B3A6B;
       --text-primary: #F5F0E8;
       --text-muted:   #A0AAB8;
+      /* Glass pill geometry */
+      --glp-h:        44px;
+      --glp-top:      10px;
+      --nav-top:      60px;  /* glp-top(10) + glp-h(44) + 6px gap */
+      --pill-zone:   140px;  /* nav-top(60) + navbar-h(72) + 8px buffer — full fixed zone */
     }
 
     html { scroll-behavior: smooth; }
@@ -70,6 +75,7 @@
       font-family: 'DM Sans', sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
+      /* no padding-top needed — navbar + pill are now in normal flow */
     }
 
     /* Grain texture overlay */
@@ -129,20 +135,11 @@
       filter: blur(150px);
     }
 
-    /* Navbar */
+    /* Navbar — normal flow, scrolls with page */
     .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      position: relative;
       background: #080D1A;
-      z-index: 99999;
-      -webkit-transform: translate3d(0, 0, 0);
-      transform: translate3d(0, 0, 0);
-      padding-top: calc(env(safe-area-inset-top) + 22px);
-      padding-right: 52px;
-      padding-bottom: 22px;
-      padding-left: 52px;
+      padding: 22px 52px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -191,7 +188,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 148px 24px 108px;
+      padding: 48px 24px 80px; /* body provides the top offset; this is visual breathing room only */
     }
 
     /* Eyebrow */
@@ -1885,22 +1882,403 @@
       .faq-chevron, .faq-answer { transition: none; }
     }
 
+    /* ── Fixed top glass pill ────────────────────────────────── */
+    /* Glass pill — sticky, sits below navbar and sticks to viewport top on scroll */
+    .glass-pill {
+      position: sticky;
+      top: 8px;
+      z-index: 100001;
+      /* Center in block context */
+      display: flex;
+      align-self: center;
+      width: fit-content;
+      margin: 8px auto 12px;
+      align-items: center;
+      gap: 16px;
+      padding: 0 22px 0 20px;
+      height: var(--glp-h);
+      border-radius: 999px;
+      /* Liquid glass */
+      background: rgba(8, 13, 26, 0.80);
+      -webkit-backdrop-filter: blur(22px) saturate(140%) brightness(1.04);
+      backdrop-filter: blur(22px) saturate(140%) brightness(1.04);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.38),
+        0 2px 8px  rgba(0, 0, 0, 0.22),
+        inset 0  1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+      white-space: nowrap;
+      max-width: calc(100vw - 24px);
+      /* Smooth show/hide */
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .glass-pill.glp-hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+    }
+
+    /* Label */
+    .glp-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(245, 241, 234, 0.88);
+      flex-shrink: 0;
+    }
+
+    /* Divider between label and blocks */
+    .glp-divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.11);
+      flex-shrink: 0;
+    }
+
+    /* Blocks row */
+    .glp-blocks {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .glp-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 38px;
+    }
+    .glp-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 17px;
+      font-weight: 400;
+      color: #F5F1EA;
+      line-height: 1;
+      letter-spacing: -0.01em;
+    }
+    .glp-unit {
+      font-family: 'DM Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 0.16em;
+      color: rgba(160, 170, 184, 0.58);
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+    .glp-sep {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: rgba(245, 241, 234, 0.22);
+      padding: 0 2px;
+      margin-bottom: 6px;
+      align-self: flex-end;
+    }
+
+    /* Mobile: hide label + divider, shrink blocks */
+    @media (max-width: 540px) {
+      .glp-label,
+      .glp-divider { display: none; }
+      .glass-pill  { gap: 0; padding: 0 16px; }
+      .glp-block   { min-width: 34px; }
+      .glp-num     { font-size: 14px; }
+      .glp-unit    { font-size: 6.5px; margin-top: 2px; }
+      .glp-sep     { font-size: 11px; padding: 0 1px; }
+    }
+
+    /* ── Offer section: countdown pill ──────────────────────── */
+    .cd-wrap {
+      margin: 0 auto 40px;
+      text-align: center;
+    }
+    .cd-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #A0AAB8;
+      opacity: 0.75;
+      margin-bottom: 16px;
+    }
+    .cd-blocks {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(27,58,107,0.38);
+      border: 1px solid rgba(212,165,116,0.2);
+      border-radius: 16px;
+      padding: 20px 24px;
+      gap: 4px;
+    }
+    .cd-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 50px;
+    }
+    .cd-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 34px;
+      font-weight: 400;
+      color: #D4A574;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .cd-unit {
+      font-family: 'DM Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.18em;
+      color: #A0AAB8;
+      opacity: 0.55;
+      margin-top: 7px;
+      text-transform: uppercase;
+    }
+    .cd-sep {
+      font-family: 'DM Mono', monospace;
+      font-size: 22px;
+      color: rgba(212,165,116,0.3);
+      padding: 0 3px;
+      margin-top: 4px;
+      align-self: flex-start;
+    }
+    @media (max-width: 480px) {
+      .cd-blocks { padding: 16px 14px; gap: 2px; }
+      .cd-block  { min-width: 40px; }
+      .cd-num    { font-size: 26px; }
+      .cd-unit   { font-size: 7px; margin-top: 5px; }
+      .cd-sep    { font-size: 16px; }
+    }
+    @media (min-width: 768px) {
+      .cd-blocks { padding: 24px 36px; gap: 6px; }
+      .cd-block  { min-width: 66px; }
+      .cd-num    { font-size: 44px; }
+      .cd-unit   { font-size: 9px; margin-top: 8px; }
+      .cd-sep    { font-size: 28px; margin-top: 6px; }
+    }
+
+    /* ── Course card ───────────────────────────────────────── */
+    .course-card {
+      max-width: 600px;
+      margin: 0 auto 40px;
+      background: rgba(255,255,255,0.032);
+      border: 1px solid rgba(232,224,208,0.11);
+      border-radius: 16px;
+      padding: 32px 28px;
+      text-align: left;
+    }
+    .course-card-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #A0AAB8;
+      opacity: 0.6;
+      display: block;
+      margin-bottom: 12px;
+    }
+    .course-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      font-weight: 600;
+      color: #F5F0E8;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+    .course-card-promise {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px;
+      font-weight: 300;
+      line-height: 1.72;
+      color: #A0AAB8;
+    }
+    .course-card-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(232,224,208,0.07);
+      margin: 22px 0;
+    }
+    .course-card-pillars {
+      list-style: none;
+      padding: 0; margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .course-card-pillar {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .pillar-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: #D4A574;
+      opacity: 0.7;
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+      padding-top: 2px;
+      min-width: 22px;
+    }
+    .pillar-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .pillar-content strong {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #F5F0E8;
+      line-height: 1.4;
+    }
+    .pillar-content span {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px;
+      font-weight: 300;
+      color: #A0AAB8;
+      line-height: 1.6;
+    }
+    .course-card-authority {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .authority-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #A0AAB8;
+      border: 1px solid rgba(232,224,208,0.14);
+      border-radius: 999px;
+      padding: 5px 12px;
+      opacity: 0.65;
+    }
+    .course-card-price {
+      text-align: center;
+    }
+    .price-anchor {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+    .price-original {
+      font-family: 'DM Mono', monospace;
+      font-size: 22px;
+      color: #A0AAB8;
+      opacity: 0.55;
+      text-decoration: line-through;
+      text-decoration-color: rgba(160,170,184,0.5);
+    }
+    .price-arrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      color: rgba(212,165,116,0.38);
+    }
+    .price-founding {
+      font-family: 'Playfair Display', serif;
+      font-size: 48px;
+      font-weight: 600;
+      color: #D4A574;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .price-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      color: #A0AAB8;
+      opacity: 0.65;
+    }
+    @media (min-width: 768px) {
+      .course-card        { padding: 44px 40px; }
+      .course-card-title  { font-size: 36px; }
+      .price-founding     { font-size: 56px; }
+    }
+
+    /* ── Add-to-cart button ────────────────────────────────── */
+    .cart-wrap { text-align: center; margin-top: 22px; }
+    .cart-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 20px 52px;
+      border-radius: 9999px;
+      border: 1px solid rgba(212,165,116,0.52);
+      background: rgba(212,165,116,0.13);
+      color: #D4A574;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14.5px;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      cursor: pointer;
+      animation: cartPulse 3.8s ease-in-out infinite;
+      transition: box-shadow 0.38s ease, background 0.38s ease, border-color 0.38s ease, transform 0.32s ease;
+      box-shadow:
+        0 0 48px rgba(212,165,116,0.17),
+        0 0 110px rgba(212,165,116,0.09),
+        inset 0 0 28px rgba(212,165,116,0.05);
+    }
+    @keyframes cartPulse {
+      0%, 100% {
+        box-shadow: 0 0 48px rgba(212,165,116,0.17), 0 0 110px rgba(212,165,116,0.09), inset 0 0 28px rgba(212,165,116,0.05);
+      }
+      50% {
+        box-shadow: 0 0 64px rgba(212,165,116,0.25), 0 0 140px rgba(212,165,116,0.13), inset 0 0 36px rgba(212,165,116,0.07);
+      }
+    }
+    .cart-btn:hover:not(:disabled) {
+      background: rgba(212,165,116,0.22);
+      border-color: rgba(212,165,116,0.78);
+      transform: translateY(-1px);
+      box-shadow:
+        0 0 72px rgba(212,165,116,0.25),
+        0 0 160px rgba(212,165,116,0.13),
+        inset 0 0 40px rgba(212,165,116,0.08);
+    }
+    .cart-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      animation: none;
+      box-shadow: none;
+      border-color: rgba(212,165,116,0.18);
+      background: rgba(212,165,116,0.04);
+    }
+    .cart-btn-arrow {
+      font-size: 15px;
+      transition: transform 0.32s ease;
+    }
+    .cart-btn:hover:not(:disabled) .cart-btn-arrow {
+      transform: translateX(5px);
+    }
+    .cart-microcopy {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      color: #A0AAB8;
+      opacity: 0.52;
+      margin-top: 14px;
+    }
+
   </style>
 </head>
 
 <body>
 
-  <!-- Perspective grid -->
+  <!-- Perspective grid (fixed, no flow height) -->
   <div class="perspective-grid"></div>
 
-  <!-- Depth: radial blobs -->
+  <!-- Depth: radial blobs (fixed, no flow height) -->
   <div class="bg-blobs">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
   </div>
 
-  <!-- Navbar -->
+  <!-- Navbar — normal flow, scrolls away with page -->
   <nav class="navbar" id="navbar">
     <a href="#" class="navbar-brand">
       <img src="brand-assets/logo.png" alt="PianoPro">
@@ -1909,12 +2287,27 @@
     <div class="navbar-status">PianoMind</div>
   </nav>
 
+  <!-- Sticky countdown pill — sits below navbar, sticks at top on scroll -->
+  <div class="glass-pill" id="glass-pill">
+    <span class="glp-label" id="glp-label">PianoMind opens in</span>
+    <div class="glp-divider"></div>
+    <div class="glp-blocks">
+      <div class="glp-block"><span class="glp-num" id="glp-days">00</span><span class="glp-unit">DAYS</span></div>
+      <div class="glp-sep">:</div>
+      <div class="glp-block"><span class="glp-num" id="glp-hours">00</span><span class="glp-unit">HOURS</span></div>
+      <div class="glp-sep">:</div>
+      <div class="glp-block"><span class="glp-num" id="glp-mins">00</span><span class="glp-unit">MINUTES</span></div>
+      <div class="glp-sep">:</div>
+      <div class="glp-block"><span class="glp-num" id="glp-secs">00</span><span class="glp-unit">SECONDS</span></div>
+    </div>
+  </div>
+
   <!-- Hero -->
   <section class="hero" id="hero">
 
     <div class="eyebrow" id="eyebrow">
       <div class="eyebrow-line"></div>
-      <span class="eyebrow-text">Waitlist Now Open</span>
+      <span class="eyebrow-text">Founding Members · Opens 3 June</span>
       <div class="eyebrow-line"></div>
     </div>
 
@@ -1929,11 +2322,11 @@
     </p>
 
     <div class="cta-group" id="cta-group">
-      <a href="#waitlist" class="cta-btn">
-        <span class="cta-btn-text">Join the waitlist</span>
+      <a href="#offer" class="cta-btn">
+        <span class="cta-btn-text">See the offer</span>
         <span class="cta-btn-arrow">↓</span>
       </a>
-      <p class="cta-microcopy">No commitment. Be the first to know when enrollment opens.</p>
+      <p class="cta-microcopy">Founding member pricing: €47. Available until 6 June.</p>
     </div>
 
     <div class="social-proof" id="social-proof">
@@ -2331,59 +2724,104 @@
 
   </section>
 
-  <!-- Final CTA section -->
-  <section class="cta-final-section" id="waitlist">
+  <!-- Offer / Enrollment section -->
+  <section class="cta-final-section" id="offer">
     <div class="cta-final-glow"></div>
     <div class="cta-final-grain"></div>
 
     <div class="cta-final-inner">
       <div class="cta-final-inner-anim">
 
-        <p class="cta-final-eyebrow">Limited Access</p>
+        <p class="cta-final-eyebrow">Founding Members — Launch Pricing</p>
 
-        <h2 class="cta-final-headline">Be among the first.</h2>
+        <h2 class="cta-final-headline">Enroll in PianoMind.</h2>
 
-        <p class="cta-final-subheadline">
-          Join the PianoMind waitlist. Get 50% off at launch and receive immediately
-          your free copy of <em>The 7 Self-Sabotaging Habits of Pianists</em>.
-        </p>
-
-        <p class="cta-final-social-proof">Join 5,000+ pianists worldwide</p>
-
-        <ul class="cta-final-benefits">
-          <li class="cta-final-benefit">
-            <span class="cta-final-benefit-check">✓</span>
-            <span class="cta-final-benefit-text">50% off at launch — founding members only</span>
-          </li>
-          <li class="cta-final-benefit">
-            <span class="cta-final-benefit-check">✓</span>
-            <span class="cta-final-benefit-text">Free copy of <em>The 7 Self-Sabotaging Habits of Pianists</em></span>
-          </li>
-          <li class="cta-final-benefit">
-            <span class="cta-final-benefit-check">✓</span>
-            <span class="cta-final-benefit-text">Priority access when enrollment opens</span>
-          </li>
-        </ul>
-
-        <form class="cta-final-form" id="waitlist-form">
-          <input class="cta-final-input" id="waitlist-name" type="text" placeholder="First name" autocomplete="given-name" required>
-          <input class="cta-final-input" id="waitlist-email" type="email" placeholder="Email address" autocomplete="email" required>
-          <button type="submit" class="cta-final-btn" id="waitlist-btn">
-            <span id="waitlist-btn-text">Join the Waitlist</span>
-            <span class="cta-final-btn-arrow" id="waitlist-btn-arrow">→</span>
-          </button>
-        </form>
-
-        <div id="waitlist-success" style="display:none; padding: 24px 0 8px;">
-          <p style="font-family:'DM Sans',sans-serif; font-size:16px; font-weight:300; color:var(--accent); line-height:1.6;">You're on the list. Check your inbox soon.</p>
+        <!-- Two-phase countdown (hidden — glass pill at top handles display) -->
+        <div class="cd-wrap" id="cd-wrap" style="display:none">
+          <p class="cd-label" id="cd-label">PianoMind opens in</p>
+          <div class="cd-blocks">
+            <div class="cd-block"><span class="cd-num" id="cd-days">00</span><span class="cd-unit">DAYS</span></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-block"><span class="cd-num" id="cd-hours">00</span><span class="cd-unit">HOURS</span></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-block"><span class="cd-num" id="cd-mins">00</span><span class="cd-unit">MINUTES</span></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-block"><span class="cd-num" id="cd-secs">00</span><span class="cd-unit">SECONDS</span></div>
+          </div>
         </div>
 
-        <div id="waitlist-error" style="display:none; padding: 8px 0;">
-          <p style="font-family:'DM Sans',sans-serif; font-size:13px; font-weight:300; color:var(--text-muted); opacity:0.7;">Something went wrong. Please try again.</p>
-        </div>
+        <!-- Course card -->
+        <div class="course-card" id="course-card">
+          <span class="course-card-eyebrow">Multi-expert video course</span>
+          <h3 class="course-card-title">PianoMind</h3>
+          <p class="course-card-promise">A structured approach to practice, performance, and stage readiness — built on motor learning research, neuroscience, and clinical performance psychology.</p>
 
-        <p class="cta-final-microcopy">No payment required. Unsubscribe at any time.</p>
-        <p class="cta-final-urgency">Founding member pricing available for a limited time.</p>
+          <div class="course-card-divider"></div>
+
+          <ul class="course-card-pillars">
+            <li class="course-card-pillar">
+              <span class="pillar-num">01</span>
+              <div class="pillar-content">
+                <strong>Piano Productivity</strong>
+                <span>Deliberate practice protocols, error correction, and structured session design.</span>
+              </div>
+            </li>
+            <li class="course-card-pillar">
+              <span class="pillar-num">02</span>
+              <div class="pillar-content">
+                <strong>Score Reading</strong>
+                <span>Structural analysis and musical intelligence applied before the keyboard.</span>
+              </div>
+            </li>
+            <li class="course-card-pillar">
+              <span class="pillar-num">03</span>
+              <div class="pillar-content">
+                <strong>Diagnosis &amp; Problem Solving</strong>
+                <span>Locating the exact source of technical and interpretive difficulties.</span>
+              </div>
+            </li>
+            <li class="course-card-pillar">
+              <span class="pillar-num">04</span>
+              <div class="pillar-content">
+                <strong>Memorization &amp; Stage Preparation</strong>
+                <span>Memory consolidation protocols and systematic exposure practice.</span>
+              </div>
+            </li>
+            <li class="course-card-pillar">
+              <span class="pillar-num">05</span>
+              <div class="pillar-content">
+                <strong>Performance Psychology</strong>
+                <span>With Heather O'Donnell, M.Sc. — ACT, anxiety regulation, and performance resilience.</span>
+              </div>
+            </li>
+          </ul>
+
+          <div class="course-card-divider"></div>
+
+          <div class="course-card-authority">
+            <span class="authority-pill">Science-based</span>
+            <span class="authority-pill">Heather O'Donnell · Performance Psychology</span>
+            <span class="authority-pill">Neuroscience-grounded</span>
+          </div>
+
+          <div class="course-card-divider"></div>
+
+          <div class="course-card-price">
+            <div class="price-anchor">
+              <span class="price-original" id="price-original">€97</span>
+              <span class="price-arrow">→</span>
+              <span class="price-founding" id="price-founding">€<span id="price-num">47</span></span>
+            </div>
+            <p class="price-label">Founding member price — available during the launch window only.</p>
+            <div class="cart-wrap">
+              <button class="cart-btn" id="cart-btn" disabled>
+                <span id="cart-btn-text">Opens 3 June, 18:00 CET</span>
+                <span class="cart-btn-arrow" id="cart-btn-arrow"></span>
+              </button>
+              <p class="cart-microcopy" id="cart-microcopy">Founding price · €47 · Available until 6 June, 18:00 CET</p>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>
@@ -2456,7 +2894,7 @@
             <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="faq-answer" role="region">
-            <p>Access details will be confirmed at launch. Join the waitlist to receive updates first.</p>
+            <p>Access is lifetime. Once you enroll, all modules are permanently available in your account.</p>
           </div>
         </div>
 
@@ -2635,6 +3073,8 @@
       scrollTrigger: { trigger: '.cta-final-section', start: 'top 90%' }
     });
 
+    // (price animation moved outside desktop gate — see below)
+
     // Testimonials section — scroll-triggered animations
     gsap.to('.testimonials-header-inner', {
       opacity: 1, y: 0, duration: 0.5, ease: 'power3.out',
@@ -2713,6 +3153,57 @@
 
     } // end post-hero scroll animations gate
 
+    // Price count-down animation: 97 → 47, fires once via IntersectionObserver
+    (function() {
+      var priceNum    = document.getElementById('price-num');
+      var priceOrig   = document.getElementById('price-original');
+      var priceArrow  = document.querySelector('.price-arrow');
+      var priceAnchor = document.querySelector('.price-anchor');
+      if (!priceNum || !priceOrig || !priceAnchor) return;
+
+      // Initial state: number shows 97, struck €97 and arrow are hidden
+      priceNum.textContent = '97';
+      gsap.set(priceOrig,  { opacity: 0, x: -12 });
+      if (priceArrow) gsap.set(priceArrow, { opacity: 0 });
+
+      var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var fired = false;
+
+      function runAnimation() {
+        if (fired) return;
+        fired = true;
+        if (reducedMotion) {
+          priceNum.textContent = '47';
+          gsap.set(priceOrig,  { opacity: 0.55, x: 0 });
+          if (priceArrow) gsap.set(priceArrow, { opacity: 1 });
+          return;
+        }
+        var priceObj = { val: 97 };
+        gsap.to(priceObj, {
+          val: 47,
+          duration: 0.75,
+          ease: 'power3.in',
+          onUpdate: function() { priceNum.textContent = Math.round(priceObj.val); },
+          onComplete: function() {
+            priceNum.textContent = '47';
+            gsap.to(priceOrig,  { opacity: 0.55, x: 0, duration: 0.32, ease: 'power2.out' });
+            if (priceArrow) gsap.to(priceArrow, { opacity: 1, duration: 0.32, ease: 'power2.out' });
+          }
+        });
+      }
+
+      var observer = new IntersectionObserver(function(entries, obs) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            obs.disconnect();
+            setTimeout(runAnimation, 500);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      observer.observe(priceAnchor);
+    })();
+
     tl.to('#eyebrow',     { opacity: 1, y: 0, duration: 0.85, delay: 0.35 })
       .to('#headline',    { opacity: 1, y: 0, duration: 1.05 }, '-=0.55')
       .to('#subheadline', { opacity: 1, y: 0, duration: 0.85 }, '-=0.62')
@@ -2722,51 +3213,104 @@
   </script>
 
   <script>
-    // Waitlist form — MailerLite API v2
+    // Single countdown timer — drives fixed glass pill + enrollment button
     (function() {
-      const form    = document.getElementById('waitlist-form');
-      const btn     = document.getElementById('waitlist-btn');
-      const btnText = document.getElementById('waitlist-btn-text');
-      const btnArrow = document.getElementById('waitlist-btn-arrow');
-      const success = document.getElementById('waitlist-success');
-      const error   = document.getElementById('waitlist-error');
+      var LAUNCH_TS    = new Date('2026-06-03T16:00:00Z').getTime();
+      var OFFER_END_TS = new Date('2026-06-06T16:00:00Z').getTime();
 
-      if (!form) return;
+      // Glass pill elements
+      var glpPill  = document.getElementById('glass-pill');
+      var glpLabel = document.getElementById('glp-label');
+      var glpDays  = document.getElementById('glp-days');
+      var glpHours = document.getElementById('glp-hours');
+      var glpMins  = document.getElementById('glp-mins');
+      var glpSecs  = document.getElementById('glp-secs');
 
-      form.addEventListener('submit', async function(e) {
-        e.preventDefault();
+      // Hidden in-section mirror elements (DOM kept, never shown)
+      var cdLabel = document.getElementById('cd-label');
+      var cdDays  = document.getElementById('cd-days');
+      var cdHours = document.getElementById('cd-hours');
+      var cdMins  = document.getElementById('cd-mins');
+      var cdSecs  = document.getElementById('cd-secs');
 
-        const name  = document.getElementById('waitlist-name').value.trim();
-        const email = document.getElementById('waitlist-email').value.trim();
-        if (!name || !email) return;
+      // Enrollment button
+      var cartBtn       = document.getElementById('cart-btn');
+      var cartBtnText   = document.getElementById('cart-btn-text');
+      var cartBtnArrow  = document.getElementById('cart-btn-arrow');
+      var cartMicrocopy = document.getElementById('cart-microcopy');
 
-        // Loading state
-        btn.disabled = true;
-        btnText.textContent = 'Sending…';
-        btnArrow.style.display = 'none';
-        error.style.display = 'none';
+      if (!cartBtn) return;
 
-        try {
-          const res = await fetch('/api/subscribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email })
-          });
+      function pad(n) { return String(n).padStart(2, '0'); }
 
-          if (res.ok) {
-            if (typeof fbq === 'function') fbq('track', 'Lead');
-            form.style.display = 'none';
-            success.style.display = 'block';
-          } else {
-            throw new Error('API error ' + res.status);
-          }
-        } catch (err) {
-          btn.disabled = false;
-          btnText.textContent = 'Join the Waitlist';
-          btnArrow.style.display = '';
-          error.style.display = 'block';
+      function setCountdown(target) {
+        var diff = Math.max(0, target - Date.now());
+        var d = pad(Math.floor(diff / 86400000));
+        var h = pad(Math.floor((diff % 86400000) / 3600000));
+        var m = pad(Math.floor((diff % 3600000) / 60000));
+        var s = pad(Math.floor((diff % 60000) / 1000));
+        // Glass pill
+        if (glpDays)  glpDays.textContent  = d;
+        if (glpHours) glpHours.textContent = h;
+        if (glpMins)  glpMins.textContent  = m;
+        if (glpSecs)  glpSecs.textContent  = s;
+        // Hidden mirror (keeps DOM consistent)
+        if (cdDays)  cdDays.textContent  = d;
+        if (cdHours) cdHours.textContent = h;
+        if (cdMins)  cdMins.textContent  = m;
+        if (cdSecs)  cdSecs.textContent  = s;
+      }
+
+      function update() {
+        var now = Date.now();
+
+        if (now < LAUNCH_TS) {
+          // Phase 1: before launch
+          if (glpPill)  glpPill.classList.remove('glp-hidden');
+          if (glpLabel) glpLabel.textContent = 'PianoMind opens in';
+          if (cdLabel)  cdLabel.textContent  = 'PianoMind opens in';
+          setCountdown(LAUNCH_TS);
+          cartBtn.disabled = true;
+          cartBtnText.textContent  = 'Opens 3 June, 18:00 CET';
+          cartBtnArrow.textContent = '';
+          if (cartMicrocopy) cartMicrocopy.textContent = 'Founding price · €47 · Available until 6 June, 18:00 CET';
+
+        } else if (now < OFFER_END_TS) {
+          // Phase 2: launch open, founding offer active
+          if (glpPill)  glpPill.classList.remove('glp-hidden');
+          if (glpLabel) glpLabel.textContent = 'Founding offer ends in';
+          if (cdLabel)  cdLabel.textContent  = 'Founding offer ends in';
+          setCountdown(OFFER_END_TS);
+          cartBtn.disabled = false;
+          cartBtnText.textContent  = 'Enroll now — €47 founding';
+          cartBtnArrow.textContent = '→';
+          if (cartMicrocopy) cartMicrocopy.textContent = 'Founding price · €47 · Offer closes 6 June, 18:00 CET';
+
+        } else {
+          // Phase 3: offer ended — hide pill
+          if (glpPill) glpPill.classList.add('glp-hidden');
+          cartBtn.disabled = false;
+          cartBtnText.textContent  = 'Enroll now';
+          cartBtnArrow.textContent = '→';
+          if (cartMicrocopy) cartMicrocopy.textContent = '';
         }
+      }
+
+      cartBtn.addEventListener('click', function() {
+        if (cartBtn.disabled) return;
+        if (typeof fbq === 'function') {
+          fbq('track', 'AddToCart', {
+            value: 47,
+            currency: 'EUR',
+            content_name: 'PianoMind Course',
+            content_ids: ['11469']
+          });
+        }
+        window.location.href = 'https://pianopro.it/?add-to-cart=11469';
       });
+
+      update();
+      setInterval(update, 1000);
     })();
   </script>
 

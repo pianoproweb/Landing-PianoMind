@@ -4,6 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PianoMind — Course</title>
+  <style id="pm-gate-style">body { visibility: hidden; }</style>
+  <script>
+    (async function() {
+      const host = window.location.hostname;
+      const isProduction = host === 'pianopro.it' || host.endsWith('.pianopro.it');
+      const isDev = !host || host === 'localhost' || host === '127.0.0.1' || host.endsWith('.vercel.app');
+
+      // Bypass gate on dev/preview hosts; fail-closed on anything unknown.
+      if (!isProduction) {
+        if (isDev) {
+          document.getElementById('pm-gate-style').remove();
+          return;
+        }
+        // Unknown host — keep gate closed (fail-safe), but don't redirect.
+        return;
+      }
+
+      try {
+        const res = await fetch('https://pianopro.it/wp-json/pianomind/v1/check', {
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (!data.logged_in || !data.has_pianomind) {
+          window.location.href = 'https://pianopro.it/my-account';
+          return;
+        }
+        // Accesso autorizzato: mostra la pagina
+        document.getElementById('pm-gate-style').remove();
+      } catch(e) {
+        // In caso di errore di rete, mostra comunque la pagina
+        // (meglio che bloccare l'utente per un problema tecnico)
+        document.getElementById('pm-gate-style').remove();
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
@@ -428,84 +463,108 @@ const UNLOCK_PCT      = 80;
 const SAVE_INTERVAL   = 10_000;
 
 /* ═══════════════════════════════════════════════════════════════
-   COURSE DATA
+   COURSE DATA  —  37 lessons across 5 sections
+
+   localStorage migration: Previous IDs used dot-notation ('1.1'–'1.6').
+   New IDs are plain integers ('1'–'37'). Old dot-notation keys stored
+   in pm_progress_v1 will not match and are silently ignored, giving
+   returning users a fresh start. Lessons 1–6 had real videos before;
+   those 6 entries lose their saved position. All other old lessons
+   were PLACEHOLDER with no real progress to preserve.
+
+   Lesson 32 (locked:true) has no video yet. It is auto-passed for
+   sequential gating: lesson 33 unlocks when lesson 31 reaches 80%,
+   skipping lesson 32. Lesson 32 is excluded from totalReal() and
+   completedCount() so it doesn't distort the progress percentage.
+   To activate it later: replace vimeoId with the real ID and remove
+   the locked:true flag — no other code changes needed.
 ═══════════════════════════════════════════════════════════════ */
-const modules = [
-  {
-    id: 1,
-    title: 'Piano Practice and Productivity Principles',
-    description: 'Evidence-based strategies for structuring practice sessions, setting measurable goals, and building sustainable habits. Grounded in cognitive science research on skill acquisition and deliberate practice.',
-    tag1: { label: 'FOUNDATIONS', bg: '#1D9E75', color: '#FFFFFF' },
-    tag2: { label: 'MODULE 1',    bg: '#D4A574', color: '#080D1A' },
-    lessons: [
-      { id: '1.1', vimeoId: '1190747389', title: 'Intro',                    instructor: 'Michelangelo Salamone', duration: null },
-      { id: '1.2', vimeoId: '1190747443', title: 'Macrogoals and Micro Goals', instructor: 'Michelangelo Salamone', duration: null },
-      { id: '1.3', vimeoId: '1190747481', title: 'Do It Well and Do It Now',  instructor: 'Michelangelo Salamone', duration: null },
-      { id: '1.4', vimeoId: '1190747511', title: 'Deadlines',                 instructor: 'Michelangelo Salamone', duration: null },
-      { id: '1.5', vimeoId: '1190747591', title: 'Productivity Habits',       instructor: 'Michelangelo Salamone', duration: null },
-      { id: '1.6', vimeoId: '1190747621', title: 'Habits',                    instructor: 'Michelangelo Salamone', duration: null }
-    ]
-  },
-  {
-    id: 2,
-    title: 'Reading',
-    description: 'Systematic approaches to sight-reading and score analysis, developing fluency and structural comprehension across styles and periods.',
-    tag1: { label: 'SKILLS',   bg: '#1B3A6B', color: '#FFFFFF' },
-    tag2: { label: 'MODULE 2', bg: '#D4A574', color: '#080D1A' },
-    lessons: [
-      { id: '2.1', vimeoId: 'PLACEHOLDER', title: 'Lesson 2.1', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
-      { id: '2.2', vimeoId: 'PLACEHOLDER', title: 'Lesson 2.2', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
-      { id: '2.3', vimeoId: 'PLACEHOLDER', title: 'Lesson 2.3', instructor: 'Michelangelo Salamone', duration: null }  // PLACEHOLDER
-    ]
-  },
-  {
-    id: 3,
-    title: 'Problem Solving and Repertoire Optimization',
-    description: 'Diagnostic frameworks for identifying technical obstacles and selecting practice strategies matched to the specific demands of the repertoire.',
-    tag1: { label: 'APPLIED',  bg: '#1D9E75', color: '#FFFFFF' },
-    tag2: { label: 'MODULE 3', bg: '#D4A574', color: '#080D1A' },
-    lessons: [
-      { id: '3.1', vimeoId: 'PLACEHOLDER', title: 'Lesson 3.1', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
-      { id: '3.2', vimeoId: 'PLACEHOLDER', title: 'Lesson 3.2', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
-      { id: '3.3', vimeoId: 'PLACEHOLDER', title: 'Lesson 3.3', instructor: 'Michelangelo Salamone', duration: null }  // PLACEHOLDER
-    ]
-  },
-  {
-    id: 4,
-    title: 'Memorization and Performance Preparation',
-    description: 'Memory encoding strategies grounded in neuroscience, combined with structured performance preparation protocols to reduce performance anxiety and increase reliability.',
-    tag1: { label: 'ADVANCED', bg: '#080D1A', color: '#FFFFFF' },
-    tag2: { label: 'MODULE 4', bg: '#D4A574', color: '#080D1A' },
-    lessons: [
-      { id: '4.1', vimeoId: 'PLACEHOLDER', title: 'Lesson 4.1', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
-      { id: '4.2', vimeoId: 'PLACEHOLDER', title: 'Lesson 4.2', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
-      { id: '4.3', vimeoId: 'PLACEHOLDER', title: 'Lesson 4.3', instructor: 'Michelangelo Salamone', duration: null }  // PLACEHOLDER
-    ]
-  },
-  {
-    id: 5,
-    title: 'Psychological Preparation',
-    description: 'Applied sport psychology methods adapted for the concert stage, covering pre-performance routines, stress regulation, and recovery from errors during live performance.',
-    tag1: { label: 'PSYCHOLOGY', bg: '#1B3A6B', color: '#FFFFFF' },
-    tag2: { label: 'MODULE 5',   bg: '#D4A574', color: '#080D1A' },
-    lessons: [
-      { id: '5.1', vimeoId: 'PLACEHOLDER', title: 'Lesson 5.1', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
-      { id: '5.2', vimeoId: 'PLACEHOLDER', title: 'Lesson 5.2', instructor: 'Michelangelo Salamone', duration: null }, // PLACEHOLDER
-      { id: '5.3', vimeoId: 'PLACEHOLDER', title: 'Lesson 5.3', instructor: 'Michelangelo Salamone', duration: null }  // PLACEHOLDER
-    ]
-  }
+
+const _SECTION_META = [
+  { tag1: { label: 'FOUNDATIONS', bg: '#1D9E75', color: '#FFFFFF' }, tag2: { label: 'SECTION 1', bg: '#D4A574', color: '#080D1A' } },
+  { tag1: { label: 'SKILLS',      bg: '#1B3A6B', color: '#FFFFFF' }, tag2: { label: 'SECTION 2', bg: '#D4A574', color: '#080D1A' } },
+  { tag1: { label: 'APPLIED',     bg: '#1D9E75', color: '#FFFFFF' }, tag2: { label: 'SECTION 3', bg: '#D4A574', color: '#080D1A' } },
+  { tag1: { label: 'ADVANCED',    bg: '#080D1A', color: '#FFFFFF' }, tag2: { label: 'SECTION 4', bg: '#D4A574', color: '#080D1A' } },
+  { tag1: { label: 'PSYCHOLOGY',  bg: '#1B3A6B', color: '#FFFFFF' }, tag2: { label: 'SECTION 5', bg: '#D4A574', color: '#080D1A' } },
 ];
+
+/* Build modules array matching existing schema; lesson IDs are '1'–'37' */
+const modules = [
+  { section: "Piano Productivity", lessons: [
+    { n: 1,  title: "Welcome",                            vimeoId: "1190747389" },
+    { n: 2,  title: "Micro and macrogoals",               vimeoId: "1190747443" },
+    { n: 3,  title: "Do it well and do it now",           vimeoId: "1190747481" },
+    { n: 4,  title: "The importance of deadlines",        vimeoId: "1190747511" },
+    { n: 5,  title: "Productivity habits",                vimeoId: "1190747591" },
+    { n: 6,  title: "How to create or destroy habits",    vimeoId: "1190747621" },
+  ]},
+  { section: "Score Reading", lessons: [
+    { n: 7,  title: "Score reading stages",               vimeoId: "1196631185" },
+    { n: 8,  title: "Score reading example",              vimeoId: "1196632389" },
+    { n: 9,  title: "Shadow playing",                     vimeoId: "1196632377" },
+    { n: 10, title: "Moving window paradigm",             vimeoId: "1196632352" },
+    { n: 11, title: "The 4 reading moments",              vimeoId: "1196632388" },
+    { n: 12, title: "Cognitive load for faster reading",  vimeoId: "1196632304" },
+  ]},
+  { section: "Diagnosis, Problem Solving, Speed and Optimization", lessons: [
+    { n: 13, title: "Motor learning stages",                         vimeoId: "1196632258" },
+    { n: 14, title: "Crisis points",                                 vimeoId: "1196632109" },
+    { n: 15, title: "Comfortable or functional fingering",           vimeoId: "1196632093" },
+    { n: 16, title: "Chord attack",                                  vimeoId: "1196632044" },
+    { n: 17, title: "Slow practice vs slow-motion practice",         vimeoId: "1196631917" },
+    { n: 18, title: "Digital approaches",                            vimeoId: "1196631915" },
+    { n: 19, title: "Interdependence of levers",                     vimeoId: "1196631903" },
+    { n: 20, title: "Scaramuzza exercises",                          vimeoId: "1196631885" },
+    { n: 21, title: "Creation of ad hoc exercises",                  vimeoId: "1196631802" },
+    { n: 22, title: "Speed and intensity",                           vimeoId: "1196631712" },
+    { n: 23, title: "Speed protocols",                               vimeoId: "1196631567" },
+    { n: 24, title: "Identifying checkpoints on complex passages",   vimeoId: "1196631554" },
+    { n: 25, title: "Diversified visual attention",                  vimeoId: "1196631530" },
+    { n: 26, title: "Blind test",                                    vimeoId: "1196631393" },
+  ]},
+  { section: "Memorizing, Testing and Preparing for the Stage", lessons: [
+    { n: 27, title: "Chunking",                   vimeoId: "1196631385" },
+    { n: 28, title: "Memorization process",       vimeoId: "1196631378" },
+    { n: 29, title: "Deadline system",            vimeoId: "1196631238" },
+    { n: 30, title: "Types of pianistic memory",  vimeoId: "1196631144" },
+    { n: 31, title: "Testing memory before stage",vimeoId: "1196631187" },
+    /* lesson 32: no video yet — locked:true makes it auto-passed for gating */
+    { n: 32, title: "Homeostasis and the principle of making everything harder", vimeoId: "PLACEHOLDER_32", locked: true },
+  ]},
+  { section: "Performance Psychology", lessons: [
+    { n: 33, title: "Cultivating the zone",              vimeoId: "1196638332" },
+    { n: 34, title: "ACT and psychological flexibility", vimeoId: "1196638920" },
+    { n: 35, title: "Self-talk",                         vimeoId: "1196638334" },
+    { n: 36, title: "Imagery and exposure",              vimeoId: "1196638331" },
+    { n: 37, title: "Career and creativity",             vimeoId: "1196638333" },
+  ]},
+].map((sec, i) => ({
+  id:   i + 1,
+  title: sec.section,
+  tag1: _SECTION_META[i].tag1,
+  tag2: _SECTION_META[i].tag2,
+  lessons: sec.lessons.map(l => ({
+    id:         String(l.n),
+    vimeoId:    l.vimeoId,
+    title:      l.title,
+    instructor: 'Michelangelo Salamone',
+    duration:   null,
+    locked:     l.locked || false,
+  }))
+}));
 
 /* Flat ordered list — derived once */
 const ALL_LESSONS_DATA = modules.flatMap(m => m.lessons.map(l => ({ ...l, _mod: m })));
-const ALL_LESSONS      = ALL_LESSONS_DATA.map(l => l.id); // 18 total
+const ALL_LESSONS      = ALL_LESSONS_DATA.map(l => l.id); // 37 total
 
 function getLessonData(id) {
   return ALL_LESSONS_DATA.find(l => l.id === id);
 }
-function isPlaceholder(id) {
+
+/* locked:true = "coming soon", no video available yet */
+function isComingSoon(id) {
   const l = getLessonData(id);
-  return l ? l.vimeoId === 'PLACEHOLDER' : false;
+  return l ? l.locked === true : false;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -528,10 +587,16 @@ function getProg(id) {
 
 /* ── Unlock logic ─────────────────────────────────────────── */
 function isUnlocked(id) {
-  if (isPlaceholder(id)) return false;
+  if (isComingSoon(id)) return false; // no video — never in a playable state
   const idx = ALL_LESSONS.indexOf(id);
-  if (idx <= 0) return true;
-  return getProg(ALL_LESSONS[idx - 1]).percentWatched >= UNLOCK_PCT;
+  if (idx <= 0) return true;          // lesson 1 always open
+  /* Skip any preceding locked:true lessons (auto-passed) to find the
+     actual blocking lesson. This makes lesson 33 unlock on lesson 31
+     reaching 80%, bypassing the coming-soon lesson 32. */
+  let prevIdx = idx - 1;
+  while (prevIdx >= 0 && isComingSoon(ALL_LESSONS[prevIdx])) prevIdx--;
+  if (prevIdx < 0) return true;
+  return getProg(ALL_LESSONS[prevIdx]).percentWatched >= UNLOCK_PCT;
 }
 function nextLesson(id) {
   const idx = ALL_LESSONS.indexOf(id);
@@ -541,11 +606,13 @@ function prevLesson(id) {
   const idx = ALL_LESSONS.indexOf(id);
   return idx > 0 ? ALL_LESSONS[idx - 1] : null;
 }
+/* locked:true lessons are excluded from the watchable total so the
+   progress bar represents only lessons with real video content. */
 function completedCount() {
-  return ALL_LESSONS.filter(id => !isPlaceholder(id) && getProg(id).percentWatched >= UNLOCK_PCT).length;
+  return ALL_LESSONS.filter(id => !isComingSoon(id) && getProg(id).percentWatched >= UNLOCK_PCT).length;
 }
 function totalReal() {
-  return ALL_LESSONS.filter(id => !isPlaceholder(id)).length;
+  return ALL_LESSONS.filter(id => !isComingSoon(id)).length; // 36 (lesson 32 excluded)
 }
 function overallPct() {
   const real = totalReal();
@@ -557,11 +624,11 @@ function overallPct() {
 ═══════════════════════════════════════════════════════════════ */
 function renderPlayer(id) {
   const lesson = getLessonData(id);
-  if (!lesson || isPlaceholder(id)) return '';
+  if (!lesson || isComingSoon(id)) return '';
 
   if (VIDEO_PROVIDER === 'vimeo') {
     return `<iframe
-      src="https://player.vimeo.com/video/${lesson.vimeoId}?title=0&byline=0&portrait=0&badge=0&autopause=0&dnt=1&player_id=0&app_id=58479"
+      src="https://player.vimeo.com/video/${lesson.vimeoId}?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479"
       frameborder="0"
       allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
       referrerpolicy="strict-origin-when-cross-origin"
@@ -625,10 +692,13 @@ function showLocked(id) {
   activeId  = id;
   playingId = null;
 
-  const prev = prevLesson(id);
-  const prevLesson_ = prev ? getLessonData(prev) : null;
-  const msg = prevLesson_
-    ? `Complete "${prevLesson_.title}" to unlock this lesson.`
+  /* Find the real blocking lesson, skipping any auto-passed coming-soon ones */
+  const idx = ALL_LESSONS.indexOf(id);
+  let prevIdx = idx - 1;
+  while (prevIdx >= 0 && isComingSoon(ALL_LESSONS[prevIdx])) prevIdx--;
+  const blockingLesson = prevIdx >= 0 ? getLessonData(ALL_LESSONS[prevIdx]) : null;
+  const msg = blockingLesson
+    ? `Complete "${blockingLesson.title}" to unlock this lesson.`
     : 'Complete the previous lesson to unlock this one.';
 
   document.getElementById('playerRatio').innerHTML = `
@@ -648,13 +718,13 @@ function showComingSoon(id) {
 
   document.getElementById('playerRatio').innerHTML = `
     <div class="player-coming-soon">
-      <p>This lesson is not yet available. Check back soon.</p>
+      <p>Coming soon.</p>
     </div>`;
 
   const lesson = getLessonData(id);
   if (lesson) {
     document.getElementById('lessonTitle').textContent = lesson.title;
-    document.getElementById('lessonDesc').textContent  = lesson._mod.description || '';
+    document.getElementById('lessonDesc').textContent  = lesson._mod.title || '';
     document.getElementById('authorName').textContent  = lesson.instructor;
     const avatar = document.getElementById('authorAvatar');
     avatar.src = '../brand-assets/Michelangelo.png';
@@ -667,7 +737,7 @@ function showComingSoon(id) {
 }
 
 function handleLessonClick(id) {
-  if (isPlaceholder(id)) {
+  if (isComingSoon(id)) {
     showComingSoon(id);
   } else if (!isUnlocked(id)) {
     showLocked(id);
@@ -684,13 +754,11 @@ function _updateLessonInfo(id) {
   if (!lesson) return;
 
   document.getElementById('lessonTitle').textContent = lesson.title;
-  document.getElementById('lessonDesc').textContent  = lesson._mod.description || '';
+  document.getElementById('lessonDesc').textContent  = lesson._mod.title || '';
   document.getElementById('authorName').textContent  = lesson.instructor;
 
   const avatar = document.getElementById('authorAvatar');
-  avatar.src = lesson.instructor === 'Michelangelo Salamone'
-    ? '../brand-assets/Michelangelo.png'
-    : '../brand-assets/Heather.png';
+  avatar.src = '../brand-assets/Michelangelo.png';
   avatar.alt = lesson.instructor;
 
   const next    = nextLesson(id);
@@ -702,8 +770,9 @@ function _updateLessonInfo(id) {
     nextBtn.style.display = 'none';
   }
 
-  const realLessons = ALL_LESSONS.filter(lid => !isPlaceholder(lid));
-  const allDone = realLessons.every(lid => getProg(lid).percentWatched >= UNLOCK_PCT);
+  const allDone = ALL_LESSONS
+    .filter(lid => !isComingSoon(lid))
+    .every(lid => getProg(lid).percentWatched >= UNLOCK_PCT);
   document.getElementById('completeBanner').classList.toggle('is-visible', !next && allDone);
 }
 
@@ -738,9 +807,8 @@ function renderModuleList() {
       </div>
       <div class="mod-lessons">${lessonsHtml}</div>`;
 
-    /* Attach click to every lesson row — handleLessonClick routes correctly */
     mod.lessons.forEach(l => {
-      const row = card.querySelector('#lr-' + l.id.replace('.', '_'));
+      const row = card.querySelector('#lr-' + l.id);
       if (row) {
         row.addEventListener('click', () => handleLessonClick(l.id));
         row.addEventListener('keydown', e => { if (e.key === 'Enter') handleLessonClick(l.id); });
@@ -752,42 +820,38 @@ function renderModuleList() {
 }
 
 function _makeLessonRow(lesson) {
-  const id       = lesson.id;
-  const p        = getProg(id);
-  const placeholder = isPlaceholder(id);
-  const unlocked = !placeholder && isUnlocked(id);
-  const done     = !placeholder && p.percentWatched >= UNLOCK_PCT;
-  const isActive = activeId === id;
-  const pct      = p.percentWatched || 0;
+  const id         = lesson.id;
+  const p          = getProg(id);
+  const comingSoon = isComingSoon(id);
+  const unlocked   = !comingSoon && isUnlocked(id);
+  const done       = !comingSoon && p.percentWatched >= UNLOCK_PCT;
+  const isActive   = activeId === id;
+  const pct        = p.percentWatched || 0;
 
   const dur    = lesson.duration;
   const durStr = dur ? `${Math.floor(dur / 60)}:${String(Math.floor(dur % 60)).padStart(2, '0')}` : '--:--';
 
   let cls = 'lr';
-  if (isActive) cls += ' lr--active';
-  if (placeholder) {
-    cls += ' lr--coming-soon';
-  } else if (!unlocked) {
-    cls += ' lr--locked';
-  }
-  if (done) cls += ' lr--done';
+  if (isActive)    cls += ' lr--active';
+  if (comingSoon)  cls += ' lr--coming-soon';
+  else if (!unlocked) cls += ' lr--locked';
+  if (done)        cls += ' lr--done';
 
-  const safeId   = id.replace('.', '_');
-  const tabindex = (unlocked || placeholder) ? '0' : '-1';
-  const role     = (unlocked || placeholder) ? `role="button" aria-label="Play ${lesson.title}"` : 'aria-disabled="true"';
+  const tabindex = (unlocked || comingSoon) ? '0' : '-1';
+  const role     = (unlocked || comingSoon) ? `role="button" aria-label="Play ${lesson.title}"` : 'aria-disabled="true"';
 
   return `
-    <div class="${cls}" id="lr-${safeId}" tabindex="${tabindex}" ${role}>
-      <div class="lr-icon">${_makeLessonIcon(unlocked, done, isActive, pct, safeId, placeholder)}</div>
+    <div class="${cls}" id="lr-${id}" tabindex="${tabindex}" ${role}>
+      <div class="lr-icon">${_makeLessonIcon(unlocked, done, isActive, pct, id, comingSoon)}</div>
       <div class="lr-info">
         <span class="lr-title">${lesson.title}</span>
-        <span class="lr-dur">${durStr}</span>
+        <span class="lr-dur">${comingSoon ? 'Coming soon' : durStr}</span>
       </div>
     </div>`;
 }
 
-function _makeLessonIcon(unlocked, done, isActive, pct, safeId, placeholder) {
-  if (!unlocked || placeholder) {
+function _makeLessonIcon(unlocked, done, isActive, pct, safeId, comingSoon) {
+  if (!unlocked || comingSoon) {
     return `<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
       <circle cx="16" cy="16" r="14" fill="white" stroke="#D1D5DB" stroke-width="2"/>
       <rect x="11" y="15" width="10" height="8" rx="2" fill="#9CA3AF"/>
@@ -834,8 +898,7 @@ function onTimeUpdate(t, dur) {
   };
 
   /* Update active-lesson arc in-place */
-  const safeId = playingId.replace('.', '_');
-  const arcEl  = document.getElementById('arc-' + safeId);
+  const arcEl = document.getElementById('arc-' + playingId);
   if (arcEl) {
     const C = 2 * Math.PI * 14;
     arcEl.setAttribute('stroke-dasharray', `${((pct / 100) * C).toFixed(2)} ${C.toFixed(2)}`);
@@ -918,7 +981,7 @@ window.addEventListener('beforeunload', () => {
 
   try {
     const last = localStorage.getItem(LAST_KEY);
-    if (last && getLessonData(last) && !isPlaceholder(last) && isUnlocked(last)) {
+    if (last && getLessonData(last) && !isComingSoon(last) && isUnlocked(last)) {
       activeId = last;
       renderModuleList();
       _updateLessonInfo(last);
