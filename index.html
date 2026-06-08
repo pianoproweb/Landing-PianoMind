@@ -2284,6 +2284,34 @@
     .cart-btn:hover:not(:disabled) .cart-btn-arrow {
       transform: translateX(5px);
     }
+    /* ── Closing-window pulse (phase 3 only) ──────────────── */
+    @keyframes closingGlow {
+      0%, 100% {
+        box-shadow:
+          0 0 48px rgba(212,165,116,0.18),
+          0 0 110px rgba(212,165,116,0.10),
+          inset 0 0 28px rgba(212,165,116,0.05);
+      }
+      50% {
+        box-shadow:
+          0 0 88px rgba(212,165,116,0.44),
+          0 0 190px rgba(212,165,116,0.22),
+          inset 0 0 52px rgba(212,165,116,0.11);
+      }
+    }
+    .cart-btn.is-closing {
+      animation: closingGlow 2s ease-in-out infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cart-btn.is-closing { animation: none; }
+    }
+    /* Gold accent on pill during closing window */
+    .glass-pill.glp-closing {
+      border-color: rgba(212,165,116,0.50);
+    }
+    .glass-pill.glp-closing .glp-label {
+      color: rgba(212,165,116,0.90);
+    }
     .cart-microcopy {
       font-family: 'DM Sans', sans-serif;
       font-size: 11px;
@@ -2317,27 +2345,14 @@
     <div class="navbar-status">PianoMind</div>
   </nav>
 
-  <!-- Sticky countdown pill — sits below navbar, sticks at top on scroll -->
-  <div class="glass-pill" id="glass-pill">
-    <span class="glp-label" id="glp-label">PianoMind opens in</span>
-    <div class="glp-divider"></div>
-    <div class="glp-blocks">
-      <div class="glp-block"><span class="glp-num" id="glp-days">00</span><span class="glp-unit">DAYS</span></div>
-      <div class="glp-sep">:</div>
-      <div class="glp-block"><span class="glp-num" id="glp-hours">00</span><span class="glp-unit">HOURS</span></div>
-      <div class="glp-sep">:</div>
-      <div class="glp-block"><span class="glp-num" id="glp-mins">00</span><span class="glp-unit">MINUTES</span></div>
-      <div class="glp-sep">:</div>
-      <div class="glp-block"><span class="glp-num" id="glp-secs">00</span><span class="glp-unit">SECONDS</span></div>
-    </div>
-  </div>
+  <!-- Countdown pill removed — evergreen state -->
 
   <!-- Hero -->
   <section class="hero" id="hero">
 
     <div class="eyebrow" id="eyebrow">
       <div class="eyebrow-line"></div>
-      <span class="eyebrow-text">Founding Members · Opens 3 June</span>
+      <span class="eyebrow-text">Multi-expert video course</span>
       <div class="eyebrow-line"></div>
     </div>
 
@@ -2358,7 +2373,7 @@
         <span class="cta-btn-text">See the offer</span>
         <span class="cta-btn-arrow">↓</span>
       </a>
-      <p class="cta-microcopy">Founding member pricing: €47. Available until 6 June.</p>
+      <p class="cta-microcopy">Full course access · €97 · Lifetime license</p>
     </div>
 
     <div class="social-proof" id="social-proof">
@@ -2765,7 +2780,7 @@
     <div class="cta-final-inner">
       <div class="cta-final-inner-anim">
 
-        <p class="cta-final-eyebrow">Founding Members — Launch Pricing</p>
+        <p class="cta-final-eyebrow">Enrol in PianoMind</p>
 
         <h2 class="cta-final-headline">Enroll in PianoMind.</h2>
 
@@ -2841,18 +2856,16 @@
 
           <div class="course-card-price">
             <div class="price-anchor">
-              <span class="price-original" id="price-original">€97</span>
-              <span class="price-arrow">→</span>
-              <span class="price-founding" id="price-founding">€<span id="price-num">47</span></span>
+              <span class="price-founding" id="price-founding">€97</span>
             </div>
-            <p class="price-label">Founding member price — available during the launch window only.</p>
+            <p class="price-label">Full course access · Lifetime license</p>
             <p class="course-card-spec"><strong>37</strong> video lessons · <strong>5</strong> modules · <strong>lifetime</strong> access</p>
             <div class="cart-wrap">
-              <button class="cart-btn" id="cart-btn" disabled>
-                <span id="cart-btn-text">Opens 3 June, 18:00 CET</span>
-                <span class="cart-btn-arrow" id="cart-btn-arrow"></span>
+              <button class="cart-btn" id="cart-btn">
+                <span id="cart-btn-text">Enrol now</span>
+                <span class="cart-btn-arrow" id="cart-btn-arrow">→</span>
               </button>
-              <p class="cart-microcopy" id="cart-microcopy">Founding price · €47 · Available until 6 June, 18:00 CET</p>
+              <p class="cart-microcopy" id="cart-microcopy">€97 · Lifetime access · Secure checkout</p>
             </div>
           </div>
         </div>
@@ -3187,56 +3200,7 @@
 
     } // end post-hero scroll animations gate
 
-    // Price count-down animation: 97 → 47, fires once via IntersectionObserver
-    (function() {
-      var priceNum    = document.getElementById('price-num');
-      var priceOrig   = document.getElementById('price-original');
-      var priceArrow  = document.querySelector('.price-arrow');
-      var priceAnchor = document.querySelector('.price-anchor');
-      if (!priceNum || !priceOrig || !priceAnchor) return;
-
-      // Initial state: number shows 97, struck €97 and arrow are hidden
-      priceNum.textContent = '97';
-      gsap.set(priceOrig,  { opacity: 0, x: -12 });
-      if (priceArrow) gsap.set(priceArrow, { opacity: 0 });
-
-      var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var fired = false;
-
-      function runAnimation() {
-        if (fired) return;
-        fired = true;
-        if (reducedMotion) {
-          priceNum.textContent = '47';
-          gsap.set(priceOrig,  { opacity: 0.55, x: 0 });
-          if (priceArrow) gsap.set(priceArrow, { opacity: 1 });
-          return;
-        }
-        var priceObj = { val: 97 };
-        gsap.to(priceObj, {
-          val: 47,
-          duration: 0.75,
-          ease: 'power3.in',
-          onUpdate: function() { priceNum.textContent = Math.round(priceObj.val); },
-          onComplete: function() {
-            priceNum.textContent = '47';
-            gsap.to(priceOrig,  { opacity: 0.55, x: 0, duration: 0.32, ease: 'power2.out' });
-            if (priceArrow) gsap.to(priceArrow, { opacity: 1, duration: 0.32, ease: 'power2.out' });
-          }
-        });
-      }
-
-      var observer = new IntersectionObserver(function(entries, obs) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            obs.disconnect();
-            setTimeout(runAnimation, 500);
-          }
-        });
-      }, { threshold: 0.3 });
-
-      observer.observe(priceAnchor);
-    })();
+    // Price display — evergreen full price €97 (no animation needed)
 
     tl.to('#eyebrow',     { opacity: 1, y: 0, duration: 0.85, delay: 0.35 })
       .to('#headline',    { opacity: 1, y: 0, duration: 1.05 }, '-=0.55')
@@ -3247,94 +3211,14 @@
   </script>
 
   <script>
-    // Single countdown timer — drives fixed glass pill + enrollment button
+    // Enrol button — evergreen full price €97
     (function() {
-      var LAUNCH_TS    = new Date('2026-06-03T16:00:00Z').getTime();
-      var OFFER_END_TS = new Date('2026-06-06T16:00:00Z').getTime();
-
-      // Glass pill elements
-      var glpPill  = document.getElementById('glass-pill');
-      var glpLabel = document.getElementById('glp-label');
-      var glpDays  = document.getElementById('glp-days');
-      var glpHours = document.getElementById('glp-hours');
-      var glpMins  = document.getElementById('glp-mins');
-      var glpSecs  = document.getElementById('glp-secs');
-
-      // Hidden in-section mirror elements (DOM kept, never shown)
-      var cdLabel = document.getElementById('cd-label');
-      var cdDays  = document.getElementById('cd-days');
-      var cdHours = document.getElementById('cd-hours');
-      var cdMins  = document.getElementById('cd-mins');
-      var cdSecs  = document.getElementById('cd-secs');
-
-      // Enrollment button
-      var cartBtn       = document.getElementById('cart-btn');
-      var cartBtnText   = document.getElementById('cart-btn-text');
-      var cartBtnArrow  = document.getElementById('cart-btn-arrow');
-      var cartMicrocopy = document.getElementById('cart-microcopy');
-
+      var cartBtn = document.getElementById('cart-btn');
       if (!cartBtn) return;
-
-      function pad(n) { return String(n).padStart(2, '0'); }
-
-      function setCountdown(target) {
-        var diff = Math.max(0, target - Date.now());
-        var d = pad(Math.floor(diff / 86400000));
-        var h = pad(Math.floor((diff % 86400000) / 3600000));
-        var m = pad(Math.floor((diff % 3600000) / 60000));
-        var s = pad(Math.floor((diff % 60000) / 1000));
-        // Glass pill
-        if (glpDays)  glpDays.textContent  = d;
-        if (glpHours) glpHours.textContent = h;
-        if (glpMins)  glpMins.textContent  = m;
-        if (glpSecs)  glpSecs.textContent  = s;
-        // Hidden mirror (keeps DOM consistent)
-        if (cdDays)  cdDays.textContent  = d;
-        if (cdHours) cdHours.textContent = h;
-        if (cdMins)  cdMins.textContent  = m;
-        if (cdSecs)  cdSecs.textContent  = s;
-      }
-
-      function update() {
-        var now = Date.now();
-
-        if (now < LAUNCH_TS) {
-          // Phase 1: before launch
-          if (glpPill)  glpPill.classList.remove('glp-hidden');
-          if (glpLabel) glpLabel.textContent = 'PianoMind opens in';
-          if (cdLabel)  cdLabel.textContent  = 'PianoMind opens in';
-          setCountdown(LAUNCH_TS);
-          cartBtn.disabled = true;
-          cartBtnText.textContent  = 'Opens 3 June, 18:00 CET';
-          cartBtnArrow.textContent = '';
-          if (cartMicrocopy) cartMicrocopy.textContent = 'Founding price · €47 · Available until 6 June, 18:00 CET';
-
-        } else if (now < OFFER_END_TS) {
-          // Phase 2: launch open, founding offer active
-          if (glpPill)  glpPill.classList.remove('glp-hidden');
-          if (glpLabel) glpLabel.textContent = 'Founding offer ends in';
-          if (cdLabel)  cdLabel.textContent  = 'Founding offer ends in';
-          setCountdown(OFFER_END_TS);
-          cartBtn.disabled = false;
-          cartBtnText.textContent  = 'Enroll now — €47 founding';
-          cartBtnArrow.textContent = '→';
-          if (cartMicrocopy) cartMicrocopy.textContent = 'Founding price · €47 · Offer closes 6 June, 18:00 CET';
-
-        } else {
-          // Phase 3: offer ended — hide pill
-          if (glpPill) glpPill.classList.add('glp-hidden');
-          cartBtn.disabled = false;
-          cartBtnText.textContent  = 'Enroll now';
-          cartBtnArrow.textContent = '→';
-          if (cartMicrocopy) cartMicrocopy.textContent = '';
-        }
-      }
-
       cartBtn.addEventListener('click', function() {
-        if (cartBtn.disabled) return;
         if (typeof fbq === 'function') {
           fbq('track', 'AddToCart', {
-            value: 47,
+            value: 97,
             currency: 'EUR',
             content_name: 'PianoMind Course',
             content_ids: ['11469']
@@ -3342,9 +3226,6 @@
         }
         window.location.href = 'https://pianopro.it/?add-to-cart=11469';
       });
-
-      update();
-      setInterval(update, 1000);
     })();
   </script>
 
