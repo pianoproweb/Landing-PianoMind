@@ -235,6 +235,16 @@
       color: var(--accent);
     }
 
+    /* animated keyword line (UTM typewriter) */
+    .hl-typed { color: var(--accent); }
+    .caret {
+      display: inline-block; width: 3px; height: 0.72em; margin-left: 5px;
+      background: var(--accent); vertical-align: baseline; transform: translateY(0.05em);
+      animation: pmBlink 1s steps(1) infinite;
+    }
+    @keyframes pmBlink { 50% { opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) { .caret { animation: none; } }
+
     /* Divider */
     .hero-divider {
       width: 48px;
@@ -2357,8 +2367,8 @@
     </div>
 
     <h1 class="hero-headline" id="headline">
-      What happens at the piano — and on stage —<br>
-      finally has a scientific explanation.
+      <em class="hl-typed"><span id="typed"></span><span class="caret" aria-hidden="true"></span></em><br>
+      at the piano — and on stage — finally explained by science.
     </h1>
 
     <p class="hero-sub" id="subheadline">
@@ -2721,7 +2731,6 @@
         </div>
         <p class="testi-quote">"PianoPro reorganized my entire approach to practice — focusing on biomechanics, functional movements, and the psychological preparation for performance. It breaks the dogmas of traditional piano schools and stays flexible, choosing the right approach based on the piece and the pianist's individual characteristics."</p>
         <div class="testi-author">
-          <div class="testi-avatar"></div>
           <div class="testi-author-info">
             <div class="testi-name-row">
               <span class="testi-name">Massimo Rosi</span>
@@ -2739,7 +2748,6 @@
         </div>
         <p class="testi-quote">"I've always been interested in the methodological aspects of piano learning — aspects that are unfortunately neglected in most academic paths. I found a method that is highly effective and practical, one that improved my approach to the keyboard, to practice, and to the stage."</p>
         <div class="testi-author">
-          <div class="testi-avatar"></div>
           <div class="testi-author-info">
             <div class="testi-name-row">
               <span class="testi-name">Piergiuseppe Parente</span>
@@ -2757,7 +2765,6 @@
         </div>
         <p class="testi-quote">"Practice no longer feels mechanical, but mental. The more the mind is trained to understand what we are doing, the more control we gain over what we will play. This becomes an attitude that integrates into your very perception of practice."</p>
         <div class="testi-author">
-          <div class="testi-avatar"></div>
           <div class="testi-author-info">
             <div class="testi-name-row">
               <span class="testi-name">Valerio Giordani</span>
@@ -2780,7 +2787,7 @@
     <div class="cta-final-inner">
       <div class="cta-final-inner-anim">
 
-        <p class="cta-final-eyebrow">Enrol in PianoMind</p>
+        <p class="cta-final-eyebrow">Enroll in PianoMind</p>
 
         <h2 class="cta-final-headline">Enroll in PianoMind.</h2>
 
@@ -2862,7 +2869,7 @@
             <p class="course-card-spec"><strong>37</strong> video lessons · <strong>5</strong> modules · <strong>lifetime</strong> access</p>
             <div class="cart-wrap">
               <button class="cart-btn" id="cart-btn">
-                <span id="cart-btn-text">Enrol now</span>
+                <span id="cart-btn-text">Enroll now</span>
                 <span class="cart-btn-arrow" id="cart-btn-arrow">→</span>
               </button>
               <p class="cart-microcopy" id="cart-microcopy">€97 · Lifetime access · Secure checkout</p>
@@ -3010,6 +3017,56 @@
     else if (w.attachEvent) { w.attachEvent("onload", loader); }
     else { w.onload = loader; }
   })(window, document);
+  </script>
+
+  <!-- Hero UTM typewriter: swaps the first headline word based on ?utm_content -->
+  <script>
+  (function () {
+    // The concepts the headline cycles through (the 5 course pillars, as angle words).
+    var KEYWORDS = ['Memory slips', 'Speeding up', 'Performance anxiety', 'Stuck passages'];
+    // utm_content value -> index of the keyword that should lead.
+    var ALIASES = {
+      memory_slips: 0, 'memory-slips': 0, memoryslips: 0, memory: 0, slips: 0, blankout: 0,
+      speed: 1, speeding: 1, speeding_up: 1, 'speeding-up': 1, tempo: 1, plateau: 1, fast: 1,
+      anxiety: 2, performance_anxiety: 2, 'performance-anxiety': 2, nerves: 2, stagefright: 2, choking: 2, freeze: 2,
+      diagnosis: 3, problem_solving: 3, 'problem-solving': 3, stuck: 3, passages: 3, blocks: 3
+    };
+
+    var typed = document.getElementById('typed');
+    if (!typed) return;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+    function lead() {
+      try {
+        var raw = new URLSearchParams(window.location.search).get('utm_content');
+        if (raw) { var k = String(raw).toLowerCase().trim(); if (k in ALIASES) return ALIASES[k]; }
+      } catch (e) {}
+      return 0;
+    }
+
+    var L = lead();
+    var ph = KEYWORDS.slice(L).concat(KEYWORDS.slice(0, L)); // start on the matched angle, then the rest
+    var S = { type: 52, del: 28, hold: 1500, holdLead: 2600, gap: 420 };
+    var pi = 0, ci = 0, mode = 'type', t = null;
+
+    function step() {
+      var cur = ph[pi];
+      if (mode === 'type') {
+        typed.textContent = cur.slice(0, ++ci);
+        if (ci >= cur.length) { mode = 'hold'; t = setTimeout(step, pi === 0 ? S.holdLead : S.hold); return; }
+        t = setTimeout(step, S.type);
+      } else if (mode === 'hold') {
+        if (ph.length < 2) return;
+        mode = 'del'; t = setTimeout(step, S.del);
+      } else {
+        typed.textContent = cur.slice(0, Math.max(0, --ci));
+        if (ci <= 0) { pi = (pi + 1) % ph.length; mode = 'type'; t = setTimeout(step, S.gap); return; }
+        t = setTimeout(step, S.del);
+      }
+    }
+
+    if (reduce) { typed.textContent = ph[0]; } else { step(); }
+  })();
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -3211,7 +3268,7 @@
   </script>
 
   <script>
-    // Enrol button — evergreen full price €97
+    // Enroll button — evergreen full price €97
     (function() {
       var cartBtn = document.getElementById('cart-btn');
       if (!cartBtn) return;
