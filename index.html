@@ -2211,6 +2211,33 @@
       margin-top: -44px;
       margin-bottom: 44px;
     }
+
+    /* ── Hero: more air on phones ──────────────────────────── */
+    @media (max-width: 600px) {
+      .hero { padding: 36px 22px 64px; }
+      .eyebrow { margin-bottom: 38px; }
+      .hero-headline {
+        font-size: clamp(27px, 7.6vw, 40px);
+        line-height: 1.18;
+        margin-bottom: 26px;
+      }
+      .hero-sub {
+        font-size: 14px;
+        line-height: 1.78;
+        max-width: 330px;
+        margin-bottom: 44px;
+      }
+      .hero-format {
+        margin-top: 0;
+        margin-bottom: 44px;
+        line-height: 1.85;
+        letter-spacing: 0.1em;
+      }
+    }
+    @media (max-width: 380px) {
+      .hero-headline { font-size: clamp(25px, 7.4vw, 34px); }
+      .hero-sub { font-size: 13.5px; max-width: 300px; }
+    }
     .learn-sub {
       font-family: 'DM Sans', sans-serif;
       font-size: 14px;
@@ -2372,8 +2399,7 @@
     </h1>
 
     <p class="hero-sub" id="subheadline">
-      A science-based approach integrating piano methodology,<br>
-      performance psychology, and neuroscience research.
+      A science-based approach integrating piano methodology, performance psychology, and neuroscience research.
     </p>
 
     <p class="hero-format">37 video lessons · 5 modules · lifetime access · learn at your own pace</p>
